@@ -23,4 +23,4 @@ async def ping(ctx):
 @client.command(aliases=['8ball'])
 async def _8ball():
 
-client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw._68r_8F-382WVogaW4kV2N96uHc")
+client.run("")
