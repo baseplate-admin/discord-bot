@@ -15,12 +15,8 @@ async def on_member_join(member):
 async def on_member_leave(member):
     print(f'{member} left the server')
 
-@client.command(aliases=["PING","ping"])
+@client.command()
 async def ping(ctx):
     await ctx.send(f'Pong! {round(client.latency * 1000)}ms')
 
-
-@client.command(aliases=['8ball'])
-async def _8ball():
-
-client.run("")
+client.run("3W-CJ6zQWi8k3-yNiLa1q98xkVTV4G")
