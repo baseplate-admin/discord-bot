@@ -23,6 +23,7 @@ bot = commands.Bot(command_prefix = get_prefix)
 async def on_ready():
     change_status.start()
     print("I am a bot and created by BasePlate-Admin!! Woo Hoo!!")
+    client.load_extension(f"cogs.music")
 
 # Error
 @client.event
@@ -166,8 +167,13 @@ async def load(ctx):
 async def unload(ctx):
     client.unload_extension(f"cogs.music")
 
+@client.command()
+async def leavevoice(ctx):
+    for x in client.voice_clients:
+        if(x.server == ctx.message.server):
+            return await x.disconnect()
 
-
+    return await client.say("I am not connected to any voice channel on this server!")
 # Error
 
 @clear.error

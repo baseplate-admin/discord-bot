@@ -62,6 +62,9 @@ class MusicCog(commands.Cog):
         ws = self.bot._connection._get_websocket(guild_id)
         await ws.voice_state(str(guild_id), channel_id)
 
+    @commands.command()
+    async def disconnet(self,client):
+        self.client.close()
 
 def setup(bot):
     bot.add_cog(MusicCog(bot))
