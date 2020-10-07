@@ -235,7 +235,19 @@ async def play(ctx, *, search):
     )
     search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
     search_result=('https://www.youtube.com/watch?v=' + search_results[0])
-    if 
+
+
+
+    server = ctx.message.guild
+    voice_channel = server.voice_client
+
+    async with ctx.typing():
+        player = await YTDLSource.from_url(search_result, loop=client.loop)
+        voice_channel.play(player, after=lambda e: print('Player error: %s' %e) if e else None)
+    await ctx.send(f'Now Playing:{player.title}')
+# Join
+@client.command()
+async def join(ctx):
     if not ctx.message.author.voice:
         await ctx.send("You are not connected to a voice channel")
         return
@@ -245,18 +257,10 @@ async def play(ctx, *, search):
 
     await channel.connect()
 
-    server = ctx.message.guild
-    voice_channel = server.voice_client
-
-    async with ctx.typing():
-        player = await YTDLSource.from_url(search_result, loop=client.loop)
-        voice_channel.play(player, after=lambda e: print('Player error: %s' %e) if e else None)
-    await ctx.send(f'Now Playing:{player.title}')
-
 #Leave
 
 @client.command(name='leave', help='This command stops makes the bot leave the voice channel')
-async def leave(ctx):
+async def stop(ctx):
     voice_client = ctx.message.guild.voice_client
     await voice_client.disconnect()
 
@@ -284,4 +288,7 @@ async def count(ctx):
         if file.endswith('.webm'):
             i += 1
     await ctx.send('the total number of files: ' + str(i))
-client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.u3i5EeUFfpuwof7tJiUXPvs_vWQ")
+
+
+
+client.run()
