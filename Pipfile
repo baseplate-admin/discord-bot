@@ -6,10 +6,8 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-"discord.py" = "*"
-youtube-search-python = "*"
-beautifulsoup4 = "*"
-requests = "*"
+"discord.py" = {extras = ["voice"], version = "*"}
+youtube-dl = "*"
 
 [requires]
 python_version = "3.8"

@@ -1,65 +1,23 @@
 import discord
 from discord.ext import commands
 import random
-import asyncio
 from discord.ext import tasks
 from itertools import cycle
-import json
 import urllib.parse
 import urllib.request
 import re
 import youtube_dl
-import glob
 import os
-import time
-import sched
-# Youtube Play Music Important stuffs which i dont know
+from discord.utils import get
+import json
+import shutil
 
-youtube_dl.utils.bug_reports_message = lambda: ''
-
-ytdl_format_options = {
-    'format': 'bestaudio/best',
-    'outtmpl': '%(extractor)s-%(id)s-%(title)s.%(ext)s',
-    'restrictfilenames': True,
-    'noplaylist': True,
-    'nocheckcertificate': True,
-    'ignoreerrors': False,
-    'logtostderr': False,
-    'quiet': True,
-    'no_warnings': True,
-    'default_search': 'auto',
-    'source_address': '0.0.0.0' # bind to ipv4 since ipv6 addresses cause issues sometimes
-}
-
-ffmpeg_options = {
-    'options': '-vn'
-}
-
-ytdl = youtube_dl.YoutubeDL(ytdl_format_options)
-
-
-class YTDLSource(discord.PCMVolumeTransformer):
-    def __init__(self, source, *, data, volume=0.5):
-        super().__init__(source, volume)
-
-        self.data = data
-
-        self.title = data.get('title')
-        self.url = data.get('url')
-
-    @classmethod
-    async def from_url(cls, url, *, loop=None, stream=False):
-        loop = loop or asyncio.get_event_loop()
-        data = await loop.run_in_executor(None, lambda: ytdl.extract_info(url, download=not stream))
-
-        if 'entries' in data:
-            # take first item from a playlist
-            data = data['entries'][0]
-
-        filename = data['url'] if stream else ytdl.prepare_filename(data)
-        return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
-
+queues = {}
 # Get prefix
+
+volume = 100
+volume_int = int(volume)
+VOLUME_CONTROL = float(volume_int/100)
 
 def get_prefix(client, message):
     jsons = open("prefixes.json", "r")
@@ -227,6 +185,7 @@ async def change_status():
 # Search Function
 @client.command(aliases=[])
 async def play(ctx, *, search):
+
     query_string = urllib.parse.urlencode({
         'search_query': search
     })
@@ -235,60 +194,209 @@ async def play(ctx, *, search):
     )
     search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
     search_result=('https://www.youtube.com/watch?v=' + search_results[0])
+    dict = {
+        "url" : search_result
+    }
+    with open('result.json', 'a') as fp:
+        json.dump(dict, fp, indent=2)
 
-
-
-    server = ctx.message.guild
-    voice_channel = server.voice_client
-
-    async with ctx.typing():
-        player = await YTDLSource.from_url(search_result, loop=client.loop)
-        voice_channel.play(player, after=lambda e: print('Player error: %s' %e) if e else None)
-    await ctx.send(f'Now Playing:{player.title}')
-# Join
-@client.command()
-async def join(ctx):
-    if not ctx.message.author.voice:
-        await ctx.send("You are not connected to a voice channel")
-        return
-
+    # Checks and connects to user voice channel
+    global voice_check
+    channel_check = ctx.message.author.voice.channel
+    voice_check = get(client.voice_clients, guild=ctx.guild)
+    if voice_check and voice_check.is_connected():
+        await voice_check.move_to(channel_check)
     else:
-        channel = ctx.message.author.voice.channel
+        voice_check = await channel_check.connect()
 
-    await channel.connect()
+    def check_queue():
+        Queue_infile = os.path.isdir("./Queue")
+        if Queue_infile is True:
+            DIR = os.path.abspath(os.path.realpath("Queue"))
+            length = len(os.listdir(DIR))
+            still_q = length - 1
+            try:
+                first_file = os.listdir(DIR)[0]
+            except:
+                print("No queued song(s)\n")
+                queues.clear()
+                return
+            main_location = os.path.dirname(os.path.realpath(__file__))
+            song_path = os.path.abspath(os.path.realpath("Queue") + "\\" + first_file)
+            if length != 0:
+                print("Song done, playing next queued\n")
+                print(f"Songs still in queue: {still_q}")
+                song_there = os.path.isfile("song.mp3")
+                if song_there:
+                    os.remove("song.mp3")
 
-#Leave
+                shutil.move(song_path, main_location)
+                for file in os.listdir("./"):
+                    if file.endswith(".mp3"):
+                        os.rename(file, "song.mp3")
+                voice.play(discord.FFmpegPCMAudio('song.mp3'), after=lambda e: check_queue())
+                voice.source = discord.PCMVolumeTransformer(voice.source)
+                voice.source.volume = VOLUME_CONTROL
+            else:
+                queues.clear()
+                return
+        else:
+            queues.clear()
+            print("No songs were queued before")
+    song_there = os.path.isfile("song.mp3")
+    try:
+        if song_there:
+            os.remove("song.mp3")
+            queues.clear()
+            print("Removing old song file")
+    except PermissionError:
+        print("Trying yo delete songs, but its played")
+        await ctx.send("ERROR:MUSIC PLAYING.")
+        return
+    Queue_infile = os.path.isdir("./Queue")
+    try:
+        Queue_folder = "./Queue"
+        if Queue_infile is True:
+            print("Removed old Queue Folder")
+            shutil.rmtree(Queue_folder)
+    except:
+        print("No old Queue folder.")
 
-@client.command(name='leave', help='This command stops makes the bot leave the voice channel')
+    await ctx.send("Downloading...")
+    #Downloading
+
+    await ctx.send("Getting From Youtube.....")
+    voice = get(client.voice_clients, guild=ctx.guild)
+    ydl_options = {
+        "format": "bestaudio/best",
+        "postprocessors": [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "320",
+            }]
+    }
+    with youtube_dl.YoutubeDL(ydl_options) as ydl:
+        print("Downloading Audio Now\n")
+        ydl.download([search_result])
+    for file in os.listdir("./"):
+        if file.endswith(".mp3"):
+            name = file
+            print(f"Renamed File: {file}\n")
+            os.rename(file, "song.mp3")
+    voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: check_queue())
+    voice.source = discord.PCMVolumeTransformer(voice.sources)
+    voice.sources.volume = VOLUME_CONTROL
+
+
+    newname = name.rsplit("-", 2)
+    await ctx.send(f"Playing, {newname[0]}")
+    print("Playing song\n")
+
+# Queue Function
+@client.command()
+async def queue(ctx, *, search):
+    # Checks and connects to user voice channel
+    global voice_check
+    channel_check = ctx.message.author.voice.channel
+    voice_check = get(client.voice_clients, guild=ctx.guild)
+    if voice_check and voice_check.is_connected():
+        await voice_check.move_to(channel_check)
+    else:
+        voice_check = await channel_check.connect()
+
+    query_string = urllib.parse.urlencode({
+        'search_query': search
+    })
+    htm_content = urllib.request.urlopen(
+        'https://www.youtube.com/results?' + query_string
+    )
+    search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
+    search_result = ('https://www.youtube.com/watch?v=' + search_results[0])
+    dict = {
+        "url" : search_result
+    }
+    with open('result.json', 'a') as fp:
+        json.dump(dict, fp, indent=2)
+
+    Queue_infile = os.path.isdir("./Queue")
+    if Queue_infile is False:
+        os.mkdir("Queue")
+    DIR = os.path.abspath(os.path.realpath("Queue"))
+    q_num = len(os.listdir(DIR))
+    q_num += 1
+    add_queue = True
+    while add_queue:
+        if q_num in queues:
+            q_num += 1
+        else:
+            add_queue = False
+            queues[q_num] = q_num
+    queue_path = os.path.abspath(os.path.realpath("Queue")+ f"\song{q_num}.%(ext)s")
+    ydl_options = {
+        "format": "bestaudio/best",
+        "outtmpl": queue_path,
+        "postprocessors": [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "320",
+        }],
+    }
+    with youtube_dl.YoutubeDL(ydl_options) as ydl:
+        print("Downloading audio now!\n")
+        ydl.download([search_result])
+    await ctx.send("Adding song " + str(q_num) + " to the queue")
+    print("Song Added to queue\n")
+
+#Pause Function
+@client.command()
+async def pause(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
+    if voice and voice.is_playing():
+        await ctx.send("Music Paused")
+        voice.pause()
+    else:
+        await ctx.send("Music not playing.")
+
+# Resume Function
+@client.command()
+async def resume(ctx):
+    voices = get(client.voice_clients, guild=ctx.guild)
+
+    if voices and voices.is_paused():
+        voices.resume()
+        await ctx.send("Resuming player")
+    else:
+        await ctx.send("Music is not resumed")
+
+# Stop Function
+@client.command()
 async def stop(ctx):
-    voice_client = ctx.message.guild.voice_client
-    await voice_client.disconnect()
+     voice_client = ctx.message.guild.voice_client
+     await voice_client.disconnect()
 
-# Python to destroy webp after every 5 min
+#Skip Function
 @client.command()
-async def clear_temp(ctx):
-    z = 0
-    x = []
-    for file in os.listdir():
-        if file.endswith('.webm'):
-            x.append(file)
-            z += 1
-    await ctx.send("the total number of files: " + str(z))
-    await ctx.send("Deleting these files.")
-    await ctx.send(x)
-    for i in glob.glob("*.webm"):
-        os.remove(i)
+async def skip(ctx):
+    voices = get(client.voice_clients, guild=ctx.guild)
+    queues.clear()
+    if voices and voices.is_playing():
+        print("Music Skipped")
+        voices.stop()
+        await ctx.send("Music Skipped")
+    else:
+        print("No music to skip")
+        await ctx.send("No music")
 
-# Count WebM Files
-@client.command()
-async def count(ctx):
-    i = 0
-    x = []
-    for file in os.listdir():
-        if file.endswith('.webm'):
-            i += 1
-    await ctx.send('the total number of files: ' + str(i))
+
+client.run("")
 
 
 
-client.run()
+
+
+
+
+## TODO ?
+# 1. Add COGS
+# 2. Add Loop Function
+# 3. Profit?
