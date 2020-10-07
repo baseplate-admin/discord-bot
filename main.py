@@ -11,8 +11,7 @@ import re
 import youtube_dl
 import glob
 import os
-import time
-import sched
+from discord.utils import get
 # Youtube Play Music Important stuffs which i dont know
 
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -227,6 +226,14 @@ async def change_status():
 # Search Function
 @client.command(aliases=[])
 async def play(ctx, *, search):
+    global voice_check
+    channel_check = ctx.message.author.voice.channel
+    voice_check = get(client.voice_clients, guild=ctx.guild)
+    if voice_check and voice_check.is_connected():
+        await voice_check.move_to(channel_check)
+    else:
+        voice_check = await channel_check.connect()
+
     query_string = urllib.parse.urlencode({
         'search_query': search
     })
@@ -235,27 +242,13 @@ async def play(ctx, *, search):
     )
     search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
     search_result=('https://www.youtube.com/watch?v=' + search_results[0])
-
-
-
     server = ctx.message.guild
     voice_channel = server.voice_client
+    player = await YTDLSource.from_url(search_result, loop=client.loop)
 
     async with ctx.typing():
-        player = await YTDLSource.from_url(search_result, loop=client.loop)
         voice_channel.play(player, after=lambda e: print('Player error: %s' %e) if e else None)
     await ctx.send(f'Now Playing:{player.title}')
-# Join
-@client.command()
-async def join(ctx):
-    if not ctx.message.author.voice:
-        await ctx.send("You are not connected to a voice channel")
-        return
-
-    else:
-        channel = ctx.message.author.voice.channel
-
-    await channel.connect()
 
 #Leave
 
@@ -291,4 +284,4 @@ async def count(ctx):
 
 
 
-client.run()
+client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.RJQZrT-NozUZX3n6AVP6Y6-v_-o")
