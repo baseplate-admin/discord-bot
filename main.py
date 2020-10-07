@@ -8,10 +8,12 @@ import json
 import urllib.parse
 import urllib.request
 import re
-
-# Youtube Play Music Important stuffs which i dont know
-
 import youtube_dl
+import glob
+import os
+import time
+import sched
+# Youtube Play Music Important stuffs which i dont know
 
 youtube_dl.utils.bug_reports_message = lambda: ''
 
@@ -56,10 +58,6 @@ class YTDLSource(discord.PCMVolumeTransformer):
 
         filename = data['url'] if stream else ytdl.prepare_filename(data)
         return cls(discord.FFmpegPCMAudio(filename, **ffmpeg_options), data=data)
-
-
-
-
 
 # Get prefix
 
@@ -227,8 +225,8 @@ async def change_status():
 #Youtube Music
 
 # Search Function
-@client.command()
-async def youtube(ctx, *, search):
+@client.command(aliases=[])
+async def play(ctx, *, search):
     query_string = urllib.parse.urlencode({
         'search_query': search
     })
@@ -237,14 +235,7 @@ async def youtube(ctx, *, search):
     )
     search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
     search_result=('https://www.youtube.com/watch?v=' + search_results[0])
-    await ctx.send(search_result)
-
-# Join and Leave
-
-
-# Join
-@client.command(name='play', help='This command makes the bot play the youtube url the voice channel')
-async def join(ctx, url):
+    if 
     if not ctx.message.author.voice:
         await ctx.send("You are not connected to a voice channel")
         return
@@ -258,16 +249,39 @@ async def join(ctx, url):
     voice_channel = server.voice_client
 
     async with ctx.typing():
-        player = await YTDLSource.from_url(url, loop=client.loop)
+        player = await YTDLSource.from_url(search_result, loop=client.loop)
         voice_channel.play(player, after=lambda e: print('Player error: %s' %e) if e else None)
     await ctx.send(f'Now Playing:{player.title}')
 
 #Leave
+
 @client.command(name='leave', help='This command stops makes the bot leave the voice channel')
 async def leave(ctx):
     voice_client = ctx.message.guild.voice_client
     await voice_client.disconnect()
 
+# Python to destroy webp after every 5 min
+@client.command()
+async def clear_temp(ctx):
+    z = 0
+    x = []
+    for file in os.listdir():
+        if file.endswith('.webm'):
+            x.append(file)
+            z += 1
+    await ctx.send("the total number of files: " + str(z))
+    await ctx.send("Deleting these files.")
+    await ctx.send(x)
+    for i in glob.glob("*.webm"):
+        os.remove(i)
 
-
-client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.5Z1lyGBfW4FleqHqD1Uhax7j2jk")
+# Count WebM Files
+@client.command()
+async def count(ctx):
+    i = 0
+    x = []
+    for file in os.listdir():
+        if file.endswith('.webm'):
+            i += 1
+    await ctx.send('the total number of files: ' + str(i))
+client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.u3i5EeUFfpuwof7tJiUXPvs_vWQ")
