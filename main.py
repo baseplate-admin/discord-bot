@@ -194,7 +194,11 @@ async def play(ctx, *, search):
     )
     search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
     search_result=('https://www.youtube.com/watch?v=' + search_results[0])
-
+    dict = {
+        "url" : search_result
+    }
+    with open('result.json', 'a') as fp:
+        json.dump(dict, fp, indent=2)
 
     # Checks and connects to user voice channel
     global voice_check
@@ -308,6 +312,11 @@ async def queue(ctx, *, search):
     )
     search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
     search_result = ('https://www.youtube.com/watch?v=' + search_results[0])
+    dict = {
+        "url" : search_result
+    }
+    with open('result.json', 'a') as fp:
+        json.dump(dict, fp, indent=2)
 
     Queue_infile = os.path.isdir("./Queue")
     if Queue_infile is False:
@@ -379,4 +388,4 @@ async def skip(ctx):
         await ctx.send("No music")
 
 
-client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.EHDQgK2S6r2GsblYkVThHO42a0Y")
+client.run("")
