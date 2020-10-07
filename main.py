@@ -12,6 +12,7 @@ import youtube_dl
 import glob
 import os
 from discord.utils import get
+import json
 # Youtube Play Music Important stuffs which i dont know
 
 youtube_dl.utils.bug_reports_message = lambda: ''
@@ -226,6 +227,7 @@ async def change_status():
 # Search Function
 @client.command(aliases=[])
 async def play(ctx, *, search):
+
     global voice_check
     channel_check = ctx.message.author.voice.channel
     voice_check = get(client.voice_clients, guild=ctx.guild)
@@ -242,13 +244,38 @@ async def play(ctx, *, search):
     )
     search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
     search_result=('https://www.youtube.com/watch?v=' + search_results[0])
+
+    # Some Constants
     server = ctx.message.guild
     voice_channel = server.voice_client
-    player = await YTDLSource.from_url(search_result, loop=client.loop)
 
+    # End constant
     async with ctx.typing():
+
+        player = await YTDLSource.from_url(search_result, loop=client.loop)
         voice_channel.play(player, after=lambda e: print('Player error: %s' %e) if e else None)
     await ctx.send(f'Now Playing:{player.title}')
+
+#Pause Function
+@client.command()
+async def pause(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
+    if voice and voice.is_playing():
+        await ctx.send("Music Paused")
+        voice.pause()
+    else:
+        await ctx.send("Music not playing.")
+
+# Resume Function
+@client.command()
+async def resume(ctx):
+    voices = get(client.voice_clients, guild=ctx.guild)
+
+    if voices and voices.is_paused():
+        voices.resume()
+        await ctx.send("Resuming player")
+    else:
+        await ctx.send("Music is not resumed")
 
 #Leave
 
@@ -284,4 +311,4 @@ async def count(ctx):
 
 
 
-client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.RJQZrT-NozUZX3n6AVP6Y6-v_-o")
+client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.3AnVy7Wsf10qamzXjoahJIKXPYE")
