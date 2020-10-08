@@ -14,8 +14,17 @@ import shutil
 from datetime import datetime
 import glob
 
+
+
+# BOT TOKEN
+TOKEN = 
+
+
+# QUEUE DICTIONARY
+
 queues = {}
 # Get prefix
+
 
 
 volume = 100
@@ -52,9 +61,12 @@ async def unload_cog(ctx, extension):
 
 # Auto loop Function
 # Cogs Loop
-for filename in os.listdir("./cogs"):
-    if filename.endswith(".py"):
-        client.load_extension(f"cogs.{filename[:-3]}")
+cogs_exist = os.path.isdir("./cogs")
+cogs_exist_1 = os.path.isdir("./Cogs")
+if cogs_exist is True or cogs_exist_1 is True:
+    for filename in os.listdir("./cogs"):
+        if filename.endswith(".py"):
+            client.load_extension(f"cogs.{filename[:-3]}")
 
 
 # Error
@@ -208,6 +220,7 @@ async def change_status():
 # Search Function
 @client.command(aliases=[])
 async def play(ctx, *, search):
+
     await ctx.message.add_reaction("▶️")
     query_string = urllib.parse.urlencode({
         'search_query': search
@@ -259,6 +272,10 @@ async def play(ctx, *, search):
     else:
         voice_check = await channel_check.connect()
 
+    def time_wait(seconds):
+        import time
+        time.sleep(seconds)
+
 
     if voice_check and voice_check.is_playing():
         Queue_infile = os.path.isdir("./Queue")
@@ -291,8 +308,10 @@ async def play(ctx, *, search):
         print("Song Added to queue\n")
 
     else:
+
+
         def check_queue():
-            time.sleep(4)
+            time_wait(5)
             Queue_infile = os.path.isdir("./Queue")
             if Queue_infile is True:
                 DIR = os.path.abspath(os.path.realpath("Queue"))
@@ -528,7 +547,7 @@ async def loop(ctx, *, search):
 
 
 
-client.run("")
+client.run(TOKEN)
 
 
 
