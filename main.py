@@ -17,9 +17,6 @@ import glob
 queues = {}
 # Get prefix
 
-# PYTHON TO DELETE
-
-
 
 volume = 100
 volume_int = int(volume)
@@ -211,7 +208,7 @@ async def change_status():
 # Search Function
 @client.command(aliases=[])
 async def play(ctx, *, search):
-
+    await ctx.message.add_reaction("▶️")
     query_string = urllib.parse.urlencode({
         'search_query': search
     })
@@ -248,6 +245,7 @@ async def play(ctx, *, search):
         "query": search,
         "time": time,
         "day": string,
+        "type": "play",
     }
     with open('result.json', 'a') as fp:
         json.dump(dict, fp, indent=2)
@@ -294,6 +292,7 @@ async def play(ctx, *, search):
 
     else:
         def check_queue():
+            time.sleep(4)
             Queue_infile = os.path.isdir("./Queue")
             if Queue_infile is True:
                 DIR = os.path.abspath(os.path.realpath("Queue"))
@@ -361,7 +360,6 @@ async def play(ctx, *, search):
             ydl.download([search_result])
         for file in os.listdir("./"):
             if file.endswith(".mp3"):
-                name = file
                 print(f"Renamed File: {file}\n")
                 os.rename(file, "song.mp3")
 
@@ -380,8 +378,9 @@ async def play(ctx, *, search):
 async def pause(ctx):
     voice = get(client.voice_clients, guild=ctx.guild)
     if voice and voice.is_playing():
-        await ctx.send("Music Paused")
         voice.pause()
+        await ctx.message.add_reaction("⏸️")
+
     else:
         await ctx.send("Music not playing.")
 
@@ -392,7 +391,7 @@ async def resume(ctx):
 
     if voices and voices.is_paused():
         voices.resume()
-        await ctx.send("Resuming player")
+        await ctx.message.add_reaction('⏯')
     else:
         await ctx.send("Music is not resumed")
 
@@ -401,6 +400,7 @@ async def resume(ctx):
 async def stop(ctx):
      voice_client = ctx.message.guild.voice_client
      await voice_client.disconnect()
+     await ctx.message.add_reaction("🛑")
 
 #Skip Function
 @client.command()
@@ -419,6 +419,7 @@ async def skip(ctx):
 #LOOP FUNCTION
 @client.command()
 async def loop(ctx, *, search):
+    await ctx.message.add_reaction("🔂")
 
     query_string = urllib.parse.urlencode({
         'search_query': search
@@ -456,6 +457,7 @@ async def loop(ctx, *, search):
         "query": search,
         "time": time,
         "day": string,
+        "type": "loop",
     }
     with open('result.json', 'a') as fp:
         json.dump(dict, fp, indent=2)
@@ -531,5 +533,6 @@ client.run("")
 
 
 ## TODO ?
-# add reactions
+# add Youtube Title
+# Add SKIP NEXT FUNCTION
 # Profit?
