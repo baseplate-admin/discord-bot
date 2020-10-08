@@ -566,6 +566,6 @@ client.run(TOKEN)
 
 
 ## TODO ?
-# add Youtube Title
+# ADD STOP FUNCTION
 # Add SKIP NEXT FUNCTION
 # Profit?
