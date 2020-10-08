@@ -12,8 +12,14 @@ from discord.utils import get
 import json
 import shutil
 from datetime import datetime
+import glob
+
 queues = {}
 # Get prefix
+
+# PYTHON TO DELETE
+
+
 
 volume = 100
 volume_int = int(volume)
@@ -197,6 +203,8 @@ async def clear_error(ctx, error):
 @tasks.loop(seconds=10)
 async def change_status():
     await client.change_presence(activity=discord.Game(next(status)))
+
+
 
 #Youtube Music
 
@@ -409,7 +417,113 @@ async def skip(ctx):
 
 
 #LOOP FUNCTION
-# ???
+@client.command()
+async def loop(ctx, *, search):
+
+    query_string = urllib.parse.urlencode({
+        'search_query': search
+    })
+    htm_content = urllib.request.urlopen(
+        'https://www.youtube.com/results?' + query_string
+    )
+    search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
+    search_result = ('https://www.youtube.com/watch?v=' + search_results[0])
+
+    # TIME AND DATE
+    obj_now = datetime.now()
+
+    hour = obj_now.hour
+    minute = obj_now.minute
+    second = obj_now.second
+    microsecond = obj_now.microsecond
+
+    time = (f"{hour}:{minute}:{second}.{microsecond}")
+
+    from datetime import date
+    import calendar
+    my_date = date.today()
+    x = calendar.day_name[my_date.weekday()]
+
+    from datetime import date
+
+    today = date.today()
+    d2 = today.strftime("%B %d, %Y")
+
+    string = x + " " + d2
+
+    dict = {
+        "url": search_result,
+        "query": search,
+        "time": time,
+        "day": string,
+    }
+    with open('result.json', 'a') as fp:
+        json.dump(dict, fp, indent=2)
+
+    # Checks and connects to user voice channel
+    global voice_check
+    channel_check = ctx.message.author.voice.channel
+    voice_check = get(client.voice_clients, guild=ctx.guild)
+    if voice_check and voice_check.is_connected():
+        await voice_check.move_to(channel_check)
+    else:
+        voice_check = await channel_check.connect()
+    queue = []
+    queue.append(search_result)
+    for i in glob.glob("*.webm"):
+        for t in glob.glob("*.m4a"):
+            for a in glob.glob("*.part"):
+                os.remove(a)
+                os.remove(t)
+                os.remove(i)
+    song_there = os.path.isfile("song.mp3")
+    if song_there:
+        os.remove("song.mp3")
+    for file in os.listdir("./"):
+        if file.endswith(".mp3"):
+            os.rename(file, "song.mp3")
+
+    def loop():
+        try:
+            for i in glob.glob(".webm"):
+                for t in glob.glob(".m4a"):
+                    for a in glob.glob("*.part"):
+                        os.remove(a)
+                        os.remove(t)
+                        os.remove(i)
+
+            voice = get(client.voice_clients, guild=ctx.guild)
+
+            print("Playing song\n")
+            voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: loop())
+            voice.source = discord.PCMVolumeTransformer(voice.source)
+            voice.source.volume = VOLUME_CONTROL
+        except:
+            pass
+
+    voice = get(client.voice_clients, guild=ctx.guild)
+    ydl_options = {
+        "format": "bestaudio/best",
+        "postprocessors": [{
+            "key": "FFmpegExtractAudio",
+            "preferredcodec": "mp3",
+            "preferredquality": "320",
+        }]
+    }
+    with youtube_dl.YoutubeDL(ydl_options) as ydl:
+        print("Downloading Audio Now\n")
+        ydl.download([search_result])
+    for file in os.listdir("./"):
+        if file.endswith(".mp3"):
+            print(f"Renamed File: {file}\n")
+            os.rename(file, "song.mp3")
+
+    await ctx.send(f"Playing, {search}")
+    print("Playing song\n")
+    voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: loop())
+    voice.source = discord.PCMVolumeTransformer(voice.sources)
+    voice.sources.volume = VOLUME_CONTROL
+
 
 
 client.run("")
@@ -417,6 +531,5 @@ client.run("")
 
 
 ## TODO ?
-# Add Loop Function
-# Profit?
 # add reactions
+# Profit?
