@@ -11,7 +11,7 @@ import os
 from discord.utils import get
 import json
 import shutil
-
+from datetime import datetime
 queues = {}
 # Get prefix
 
@@ -44,13 +44,13 @@ async def on_command_error(ctx, error):
 
 #   On member kick
 @client.event
-async def on_member_remove():
+async def on_member_remove(member):
     print(f'{member} has been kicked from the server!! We will not miss him')
 
 
 #   On member Add
 @client.event
-async def on_member_join():
+async def on_member_join(member):
     print(f"{member} has joined TFB!! Lets Welcome him.")
 
 # Prefix events
@@ -194,8 +194,34 @@ async def play(ctx, *, search):
     )
     search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
     search_result=('https://www.youtube.com/watch?v=' + search_results[0])
+
+    # TIME AND DATE
+    obj_now = datetime.now()
+
+    hour = obj_now.hour
+    minute = obj_now.minute
+    second = obj_now.second
+    microsecond = obj_now.microsecond
+
+    time = (f"{hour}:{minute}:{second}.{microsecond}")
+
+    from datetime import date
+    import calendar
+    my_date = date.today()
+    x = calendar.day_name[my_date.weekday()]
+
+    from datetime import date
+
+    today = date.today()
+    d2 = today.strftime("%B %d, %Y")
+
+    string = x + " " + d2
+
     dict = {
-        "url" : search_result
+        "url" : search_result,
+        "query": search,
+        "time": time,
+        "day": string,
     }
     with open('result.json', 'a') as fp:
         json.dump(dict, fp, indent=2)
@@ -262,10 +288,7 @@ async def play(ctx, *, search):
     except:
         print("No old Queue folder.")
 
-    await ctx.send("Downloading...")
     #Downloading
-
-    await ctx.send("Getting From Youtube.....")
     voice = get(client.voice_clients, guild=ctx.guild)
     ydl_options = {
         "format": "bestaudio/best",
@@ -295,15 +318,7 @@ async def play(ctx, *, search):
 # Queue Function
 @client.command()
 async def queue(ctx, *, search):
-    # Checks and connects to user voice channel
-    global voice_check
-    channel_check = ctx.message.author.voice.channel
-    voice_check = get(client.voice_clients, guild=ctx.guild)
-    if voice_check and voice_check.is_connected():
-        await voice_check.move_to(channel_check)
-    else:
-        voice_check = await channel_check.connect()
-
+    ## Youtube search function
     query_string = urllib.parse.urlencode({
         'search_query': search
     })
@@ -312,8 +327,36 @@ async def queue(ctx, *, search):
     )
     search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
     search_result = ('https://www.youtube.com/watch?v=' + search_results[0])
+
+    # GET TIME AND DATE
+
+    # creating object
+    obj_now = datetime.now()
+
+    hour = obj_now.hour
+    minute = obj_now.minute
+    second = obj_now.second
+    microsecond = obj_now.microsecond
+
+    time = (f"{hour}:{minute}:{second}.{microsecond}")
+
+    from datetime import date
+    import calendar
+    my_date = date.today()
+    x = calendar.day_name[my_date.weekday()]
+
+    from datetime import date
+
+    today = date.today()
+    d2 = today.strftime("%B %d, %Y")
+
+    string = x + " " + d2
+
     dict = {
-        "url" : search_result
+        "url" : search_result,
+        "query": search,
+        "time": time,
+        "day": string,
     }
     with open('result.json', 'a') as fp:
         json.dump(dict, fp, indent=2)
@@ -388,7 +431,7 @@ async def skip(ctx):
         await ctx.send("No music")
 
 
-client.run("")
+client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.c8z312Kxa4jIQ5ArSbcCkST82ko")
 
 
 
@@ -400,3 +443,5 @@ client.run("")
 # 1. Add COGS
 # 2. Add Loop Function
 # 3. Profit?
+# Polish the queue
+# add reactions
