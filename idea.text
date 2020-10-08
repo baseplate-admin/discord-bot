@@ -1,6 +1,0 @@
-        # GET TITLE
-
-        page = urllib.request.urlopen(search_result)
-        html = BeautifulSoup(page.read(), "html.parser")
-        bs4_title = html.title.string
-        # END LOGIC
