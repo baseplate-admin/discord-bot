@@ -6,8 +6,9 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-"discord.py" = {extras = ["voice"], version = "*"}
 youtube-dl = "*"
+"discord.py" = {extras = ["voice"], version = "*"}
+pynacl = "*"
 
 [requires]
 python_version = "3.8"
