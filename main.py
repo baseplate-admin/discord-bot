@@ -25,7 +25,6 @@ def get_prefix(client, message):
     return prefixes[str(message.guild.id)]
 
 client = commands.Bot(command_prefix = get_prefix)
-bot = commands.Bot(command_prefix = get_prefix)
 status = cycle(["I am a bot!", "Life in python,Its fantastic", "Fun!!"])
 
 #   Discord Events!!
@@ -34,6 +33,25 @@ status = cycle(["I am a bot!", "Life in python,Its fantastic", "Fun!!"])
 async def on_ready():
     change_status.start()
     print("I am a bot and created by BasePlate-Admin!! Woo Hoo!!")
+
+# COGS LOOP
+
+# Manual add or delete function
+# Load Cogs
+@client.command()
+async def load_cog(ctx, extension):
+    client.load_extension(f"cogs.{extension}")
+
+# Unload Cogs
+@client.command()
+async def unload_cog(ctx, extension):
+    client.unload_extension(f"cogs.{extension}")
+
+# Auto loop Function
+# Cogs Loop
+for filename in os.listdir("./cogs"):
+    if filename.endswith(".py"):
+        client.load_extension(f"cogs.{filename[:-3]}")
 
 
 # Error
@@ -338,8 +356,8 @@ async def play(ctx, *, search):
                 name = file
                 print(f"Renamed File: {file}\n")
                 os.rename(file, "song.mp3")
-        newname = name.rsplit("-", 2)
-        await ctx.send(f"Playing, {newname[1]}")
+
+        await ctx.send(f"Playing, {search}")
         print("Playing song\n")
         voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: check_queue())
         voice.source = discord.PCMVolumeTransformer(voice.sources)
@@ -390,11 +408,12 @@ async def skip(ctx):
         await ctx.send("No music")
 
 
-client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.EjbHhDGwxEJIzVdrBFgeGPM88TE")
+
+
+client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.JOC8i3PCXsCJYxUlN3QgdnZe1xo")
 
 
 ## TODO ?
-# 1. Add COGS
-# 2. Add Loop Function
-# 3. Profit?
+# Add Loop Function
+# Profit?
 # add reactions
