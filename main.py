@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 import calendar
 
 # BOT TOKEN
-TOKEN = "NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.nWLieBLWnksw1I7svQ_d1pCyXW4"
+TOKEN = ""
 
 
 # QUEUE DICTIONARY
@@ -353,15 +353,15 @@ async def play(ctx, *, search):
                     if length != 0:
                         print("Song done, playing next queued\n")
                         print(f"Songs still in queue: {still_q}")
-                        song_there = os.path.isfile("song.mp3")
+                        song_there = os.path.isfile("zad.mp3")
                         if song_there:
-                            os.remove("song.mp3")
+                            os.remove("zad.mp3")
 
                         shutil.move(song_path, main_location)
                         for file in os.listdir("./"):
                             if file.endswith(".mp3"):
-                                os.rename(file, "song.mp3")
-                        voice.play(discord.FFmpegPCMAudio('song.mp3'), after=lambda e: check_queue())
+                                os.rename(file, "zad.mp3")
+                        voice.play(discord.FFmpegPCMAudio('zad.mp3'), after=lambda e: check_queue())
                         voice.source = discord.PCMVolumeTransformer(voice.source)
                         voice.source.volume = VOLUME_CONTROL
                     else:
@@ -370,10 +370,10 @@ async def play(ctx, *, search):
                 else:
                     queues.clear()
                     print("No songs were queued before")
-            song_there = os.path.isfile("song.mp3")
+            song_there = os.path.isfile("zad.mp3")
             try:
                 if song_there:
-                    os.remove("song.mp3")
+                    os.remove("zad.mp3")
                     queues.clear()
                     print("Removing old song file")
             except PermissionError:
@@ -405,7 +405,7 @@ async def play(ctx, *, search):
             for file in os.listdir("./"):
                 if file.endswith(".mp3"):
                     print(f"Renamed File: {file}\n")
-                    os.rename(file, "song.mp3")
+                    os.rename(file, "zad.mp3")
             # BS4 Logic
             # GET TITLE
 
@@ -416,7 +416,7 @@ async def play(ctx, *, search):
 
             await ctx.send(f"Playing, {bs4_title}")
             print("Playing song\n")
-            voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: check_queue())
+            voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: check_queue())
             await ctx.message.add_reaction("▶️")
             voice.source = discord.PCMVolumeTransformer(voice.sources)
             voice.sources.volume = VOLUME_CONTROL
@@ -447,12 +447,12 @@ async def resume(ctx):
     else:
         await ctx.send("Music is not resumed")
 
-# Stop Function
+# Leave Function
 @client.command()
-async def stop(ctx):
+async def leave(ctx):
      voice_client = ctx.message.guild.voice_client
      await voice_client.disconnect()
-     await ctx.message.add_reaction("🛑")
+     await ctx.message.add_reaction("👋")
 
 #Skip Function
 @client.command()
@@ -529,12 +529,12 @@ async def loop(ctx, *, search):
                 os.remove(a)
                 os.remove(t)
                 os.remove(i)
-    song_there = os.path.isfile("song.mp3")
+    song_there = os.path.isfile("zad.mp3")
     if song_there:
-        os.remove("song.mp3")
+        os.remove("zad.mp3")
     for file in os.listdir("./"):
         if file.endswith(".mp3"):
-            os.rename(file, "song.mp3")
+            os.rename(file, "zad.mp3")
 
     def loop():
         try:
@@ -548,7 +548,7 @@ async def loop(ctx, *, search):
             voice = get(client.voice_clients, guild=ctx.guild)
 
             print("Playing song\n")
-            voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: loop())
+            voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: loop())
             voice.source = discord.PCMVolumeTransformer(voice.source)
             voice.source.volume = VOLUME_CONTROL
         except:
@@ -569,7 +569,7 @@ async def loop(ctx, *, search):
     for file in os.listdir("./"):
         if file.endswith(".mp3"):
             print(f"Renamed File: {file}\n")
-            os.rename(file, "song.mp3")
+            os.rename(file, "zad.mp3")
         # BS4 Logic
         # GET TITLE
 
@@ -580,18 +580,35 @@ async def loop(ctx, *, search):
 
         await ctx.send(f"Looping, {bs4_title}")
     print("Playing song\n")
-    voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: loop())
+    voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: loop())
     await ctx.message.add_reaction("🔂")
     voice.source = discord.PCMVolumeTransformer(voice.sources)
     voice.sources.volume = VOLUME_CONTROL
 
-
-
+# Stop Function
+@client.command()
+async def stop(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
+    queues.clear()
+    queue_isfile = os.path.isdir("./Queue")
+    if queue_isfile is True:
+        shutil.rmtree("./Queue")
+    if voice and voice.is_playing():
+        print("Music Stopped")
+        voice.stop()
+        await ctx.message.add_reaction("🛑")
+        music_isfile = os.path.isfile("zad.mp3")
+        if music_isfile is True:
+            os.remove('zad.mp3')
 client.run(TOKEN)
 
-
-
+@client.command()
+async def next(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
+    if voice and voice.is_playing():
+        print("Playing Next Song")
+        voice.stop()
+        await ctx.message.add_reaction("⏭️")
 ## TODO ?
-# ADD STOP FUNCTION
-# Add SKIP NEXT FUNCTION
+# You tell me.
 # Profit?
