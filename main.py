@@ -408,9 +408,12 @@ async def skip(ctx):
         await ctx.send("No music")
 
 
+#LOOP FUNCTION
+# ???
 
 
-client.run("NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.JOC8i3PCXsCJYxUlN3QgdnZe1xo")
+client.run("")
+
 
 
 ## TODO ?
