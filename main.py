@@ -13,11 +13,11 @@ import json
 import shutil
 from datetime import datetime
 import glob
-
+from bs4 import BeautifulSoup
 
 
 # BOT TOKEN
-TOKEN = 
+TOKEN = "NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.FTXUnLV9GodLtYM_Wz3rVGtDJzU"
 
 
 # QUEUE DICTIONARY
@@ -221,7 +221,6 @@ async def change_status():
 @client.command(aliases=[])
 async def play(ctx, *, search):
 
-    await ctx.message.add_reaction("▶️")
     query_string = urllib.parse.urlencode({
         'search_query': search
     })
@@ -381,10 +380,18 @@ async def play(ctx, *, search):
             if file.endswith(".mp3"):
                 print(f"Renamed File: {file}\n")
                 os.rename(file, "song.mp3")
+        # BS4 Logic
+        # GET TITLE
 
-        await ctx.send(f"Playing, {search}")
+        page = urllib.request.urlopen(search_result)
+        html = BeautifulSoup(page.read(), "html.parser")
+        bs4_title = html.title.string
+        # END LOGIC
+
+        await ctx.send(f"Playing, {bs4_title}")
         print("Playing song\n")
         voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: check_queue())
+        await ctx.message.add_reaction("▶️")
         voice.source = discord.PCMVolumeTransformer(voice.sources)
         voice.sources.volume = VOLUME_CONTROL
 
@@ -438,7 +445,6 @@ async def skip(ctx):
 #LOOP FUNCTION
 @client.command()
 async def loop(ctx, *, search):
-    await ctx.message.add_reaction("🔂")
 
     query_string = urllib.parse.urlencode({
         'search_query': search
@@ -538,10 +544,18 @@ async def loop(ctx, *, search):
         if file.endswith(".mp3"):
             print(f"Renamed File: {file}\n")
             os.rename(file, "song.mp3")
+        # BS4 Logic
+        # GET TITLE
 
-    await ctx.send(f"Playing, {search}")
+        page = urllib.request.urlopen(search_result)
+        html = BeautifulSoup(page.read(), "html.parser")
+        bs4_title = html.title.string
+        # END LOGIC
+
+        await ctx.send(f"Looping, {bs4_title}")
     print("Playing song\n")
     voice.play(discord.FFmpegPCMAudio("song.mp3"), after=lambda e: loop())
+    await ctx.message.add_reaction("🔂")
     voice.source = discord.PCMVolumeTransformer(voice.sources)
     voice.sources.volume = VOLUME_CONTROL
 
