@@ -15,7 +15,7 @@ from datetime import datetime
 import glob
 from bs4 import BeautifulSoup
 import calendar
-import concurrent.futures
+
 # BOT TOKEN
 TOKEN = ""
 
@@ -246,53 +246,56 @@ async def play(ctx, *, search):
         await ctx.send("You are not connected to a voice channel")
         return
     else:
-        query_string = urllib.parse.urlencode({
-            'search_query': search
-        })
-        htm_content = urllib.request.urlopen(
-            'https://www.youtube.com/results?' + query_string
-        )
-        search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
-        search_result=('https://www.youtube.com/watch?v=' + search_results[0])
+        def search_youtube(query):
+            query_string = urllib.parse.urlencode({
+                'search_query': query,
+            })
+            htm_content = urllib.request.urlopen(
+                'https://www.youtube.com/results?' + query_string
+            )
+            search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
+            search_result_1 = ('https://www.youtube.com/watch?v=' + search_results[0])
+            return search_result_1
 
         # TIME AND DATE
-        obj_now = datetime.now()
+        def telementry(link):
+            obj_now = datetime.now()
 
-        hour = obj_now.hour
-        minute = obj_now.minute
-        second = obj_now.second
-        microsecond = obj_now.microsecond
+            hour = obj_now.hour
+            minute = obj_now.minute
+            second = obj_now.second
+            microsecond = obj_now.microsecond
 
-        time = (f"{hour}:{minute}:{second}.{microsecond}")
+            time = (f"{hour}:{minute}:{second}.{microsecond}")
 
-        from datetime import date
+            from datetime import date
 
-        my_date = date.today()
-        x = calendar.day_name[my_date.weekday()]
+            my_date = date.today()
+            x = calendar.day_name[my_date.weekday()]
 
-        from datetime import date
+            from datetime import date
 
-        today = date.today()
-        d2 = today.strftime("%B %d, %Y")
+            today = date.today()
+            d2 = today.strftime("%B %d, %Y")
 
-        string = x + " " + d2
+            string = x + " " + d2
 
-        dict = {
-            "url" : search_result,
-            "query": search,
-            "time": time,
-            "day": string,
-            "type": "play",
-        }
-        with open('result.json', 'a') as fp:
-            json.dump(dict, fp, indent=2)
+            dict = {
+                "url": link,
+                "query": search,
+                "time": time,
+                "day": string,
+                "type": "play",
+            }
+            with open('result.json', 'a') as fp:
+                json.dump(dict, fp, indent=2)
 
         ## TIME KILL FUNTION
         def time_wait(seconds):
             import time
             time.sleep(seconds)
         # Checks and connects to user voice channel
-
+        ## CANNOT BE PARALLELIZED
         global voice_check
         channel_check = ctx.message.author.voice.channel
         voice_check = get(client.voice_clients, guild=ctx.guild)
@@ -300,7 +303,6 @@ async def play(ctx, *, search):
             await voice_check.move_to(channel_check)
         else:
             voice_check = await channel_check.connect()
-
 
 
         if voice_check and voice_check.is_playing():
@@ -329,12 +331,13 @@ async def play(ctx, *, search):
             }
             with youtube_dl.YoutubeDL(ydl_options) as ydl:
                 print("Downloading audio now!\n")
-                ydl.download([search_result])
+                ydl.download([search_youtube(search)])
             await ctx.send("Adding " + search + " to the queue")
             print("Song Added to queue\n")
 
         else:
             def check_queue():
+                voice = get(client.voice_clients, guild=ctx.guild)
                 time_wait(5)
                 Queue_infile = os.path.isdir("./Queue")
                 if Queue_infile is True:
@@ -369,59 +372,85 @@ async def play(ctx, *, search):
                 else:
                     queues.clear()
                     print("No songs were queued before")
-            song_there = os.path.isfile("zad.mp3")
-            try:
-                if song_there:
-                    os.remove("zad.mp3")
-                    queues.clear()
-                    print("Removing old song file")
-            except PermissionError:
-                print("Trying to delete songs, but its being played")
-                await ctx.send("ERROR:MUSIC PLAYING.")
-                return
-            Queue_infile = os.path.isdir("./Queue")
-            try:
-                Queue_folder = "./Queue"
-                if Queue_infile is True:
-                    print("Removed old Queue Folder")
-                    shutil.rmtree(Queue_folder)
-            except:
-                print("No old Queue folder.")
+            def song_and_queue_check():
+                song_there = os.path.isfile("zad.mp3")
+                try:
+                    if song_there:
+                        os.remove("zad.mp3")
+                        queues.clear()
+                        print("Removing old song file")
+                except PermissionError:
+                    print("Trying to delete songs, but its being played")
+                    #await ctx.send("ERROR:MUSIC PLAYING.")
+                    return
+                Queue_infile = os.path.isdir("./Queue")
+                try:
+                    Queue_folder = "./Queue"
+                    if Queue_infile is True:
+                        print("Removed old Queue Folder")
+                        shutil.rmtree(Queue_folder)
+                except:
+                    print("No old Queue folder.")
 
             #Downloading
-            voice = get(client.voice_clients, guild=ctx.guild)
-            ydl_options = {
-                "format": "bestaudio/best",
-                "postprocessors": [{
-                    "key": "FFmpegExtractAudio",
-                    "preferredcodec": "mp3",
-                    "preferredquality": "320",
-                    }]
-            }
-            with youtube_dl.YoutubeDL(ydl_options) as ydl:
-                print("Downloading Audio Now\n")
-                ydl.download([search_result])
-            for file in os.listdir("./"):
-                if file.endswith(".mp3"):
-                    print(f"Renamed File: {file}\n")
-                    os.rename(file, "zad.mp3")
-            # BS4 Logic
-            # GET TITLE
 
-            page = urllib.request.urlopen(search_result)
-            html = BeautifulSoup(page.read(), "html.parser")
-            bs4_title = html.title.string
-            # END LOGIC
+            def play_song(link):
+                ydl_options = {
+                    "format": "bestaudio/best",
+                    "postprocessors": [{
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "mp3",
+                        "preferredquality": "320",
+                        }]
+                }
+                with youtube_dl.YoutubeDL(ydl_options) as ydl:
+                    print("Downloading Audio Now\n")
+                    ydl.download([link])
+                for file in os.listdir("./"):
+                    if file.endswith(".mp3"):
+                        print(f"Renamed File: {file}\n")
+                        os.rename(file, "zad.mp3")
+                # Play SONG LOGIC
+                voice = get(client.voice_clients, guild=ctx.guild)
 
+                print("Playing song\n")
+                voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: check_queue())
+                # END LOGIC
+                # Reaction LOGIC
+
+                voice.source = discord.PCMVolumeTransformer(voice.sources)
+                voice.sources.volume = VOLUME_CONTROL
+                # END LOGIC
+
+            ## CALLS ALL THE FUNCTION
+            # BS4 Search LOGIC
+            link = search_youtube(search)
+            def bs4_GET_TITLE(link):
+                page = urllib.request.urlopen(link)
+                html = BeautifulSoup(page.read(), "html.parser")
+                bs4_title_1 = html.title.string
+                return bs4_title_1
+            # Logic Ends Here
+
+            ## SEND REACTION LOGIC
+            bs4_title = bs4_GET_TITLE(link)
             await ctx.send(f"Playing, {bs4_title}")
-            print("Playing song\n")
-            voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: check_queue())
             await ctx.message.add_reaction("▶️")
-            voice.source = discord.PCMVolumeTransformer(voice.sources)
-            voice.sources.volume = VOLUME_CONTROL
+            ## LOGIC ENDS HERE
+            ## Parallel
+            ## MULTIPROCESS LOGIC
+            def multiprocessing(link):
+                import time
+                from concurrent.futures import ThreadPoolExecutor
+                with ThreadPoolExecutor(max_workers=3) as executor:
+                    to_do = [executor.submit(song_and_queue_check),
+                             executor.submit(play_song, link),
+                             executor.submit(telementry, link)]
 
-
-
+            ## END FUNCTION CALL
+            ## LOGIC FUNCTION
+            multiprocessing(link)
+            ##  END LOGIC FUNCTION
 # Queue Function
 
 #Pause Function
