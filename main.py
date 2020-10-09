@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 import calendar
 
 # BOT TOKEN
-TOKEN = "NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.J7k9mFSvIb29juRerE-77aqWr5U"
+TOKEN = ""
 
 
 # QUEUE DICTIONARY
@@ -437,7 +437,7 @@ async def play(ctx, *, search):
             await ctx.send(f"Playing, {bs4_title}")
             await ctx.message.add_reaction("▶️")
             ## LOGIC ENDS HERE
-            ## Parallel
+
             ## MULTIPROCESS LOGIC
             def multiprocessing(link):
                 import time
@@ -448,9 +448,8 @@ async def play(ctx, *, search):
                              executor.submit(telementry, link)]
 
             ## END FUNCTION CALL
-            ## LOGIC FUNCTION
             multiprocessing(link)
-            ##  END LOGIC FUNCTION
+
 # Queue Function
 
 #Pause Function
@@ -504,46 +503,48 @@ async def loop(ctx, *, search):
         return
     else:
 
-        query_string = urllib.parse.urlencode({
-            'search_query': search
-        })
-        htm_content = urllib.request.urlopen(
-            'https://www.youtube.com/results?' + query_string
-        )
-        search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
-        search_result = ('https://www.youtube.com/watch?v=' + search_results[0])
-
+        def youtube_search(search):
+            query_string = urllib.parse.urlencode({
+                'search_query': search
+            })
+            htm_content = urllib.request.urlopen(
+                'https://www.youtube.com/results?' + query_string
+            )
+            search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
+            search_result = ('https://www.youtube.com/watch?v=' + search_results[0])
+            return search_result
         # TIME AND DATE
-        obj_now = datetime.now()
+        def telementry(link):
+            obj_now = datetime.now()
 
-        hour = obj_now.hour
-        minute = obj_now.minute
-        second = obj_now.second
-        microsecond = obj_now.microsecond
+            hour = obj_now.hour
+            minute = obj_now.minute
+            second = obj_now.second
+            microsecond = obj_now.microsecond
 
-        time = (f"{hour}:{minute}:{second}.{microsecond}")
+            time = (f"{hour}:{minute}:{second}.{microsecond}")
 
-        from datetime import date
-        import calendar
-        my_date = date.today()
-        x = calendar.day_name[my_date.weekday()]
+            from datetime import date
+            import calendar
+            my_date = date.today()
+            x = calendar.day_name[my_date.weekday()]
 
-        from datetime import date
+            from datetime import date
 
-        today = date.today()
-        d2 = today.strftime("%B %d, %Y")
+            today = date.today()
+            d2 = today.strftime("%B %d, %Y")
 
-        string = x + " " + d2
+            string = x + " " + d2
 
-        dict = {
-            "url": search_result,
-            "query": search,
-            "time": time,
-            "day": string,
-            "type": "loop",
-        }
-        with open('result.json', 'a') as fp:
-            json.dump(dict, fp, indent=2)
+            dict = {
+                "url": link,
+                "query": search,
+                "time": time,
+                "day": string,
+                "type": "loop",
+            }
+            with open('result.json', 'a') as fp:
+                json.dump(dict, fp, indent=2)
 
         # Checks and connects to user voice channel
         global voice_check
@@ -553,18 +554,16 @@ async def loop(ctx, *, search):
             await voice_check.move_to(channel_check)
         else:
             voice_check = await channel_check.connect()
-        for i in glob.glob("*.webm"):
-            for t in glob.glob("*.m4a"):
-                for a in glob.glob("*.part"):
-                    os.remove(a)
-                    os.remove(t)
-                    os.remove(i)
-        song_there = os.path.isfile("zad.mp3")
-        if song_there:
-            os.remove("zad.mp3")
-        for file in os.listdir("./"):
-            if file.endswith(".mp3"):
-                os.rename(file, "zad.mp3")
+        ## REMOVES UNNECESSARY FILES
+        def glob_check():
+            for i in glob.glob("*.webm"):
+                for t in glob.glob("*.m4a"):
+                    for a in glob.glob("*.part"):
+                        os.remove(a)
+                        os.remove(t)
+                        os.remove(i)
+
+
 
         def loop():
             try:
@@ -581,40 +580,62 @@ async def loop(ctx, *, search):
                 voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: loop())
                 voice.source = discord.PCMVolumeTransformer(voice.source)
                 voice.source.volume = VOLUME_CONTROL
+
             except:
                 pass
 
-        voice = get(client.voice_clients, guild=ctx.guild)
-        ydl_options = {
-            "format": "bestaudio/best",
-            "postprocessors": [{
-                "key": "FFmpegExtractAudio",
-                "preferredcodec": "mp3",
-                "preferredquality": "320",
-            }]
-        }
-        with youtube_dl.YoutubeDL(ydl_options) as ydl:
-            print("Downloading Audio Now\n")
-            ydl.download([search_result])
-        for file in os.listdir("./"):
-            if file.endswith(".mp3"):
-                print(f"Renamed File: {file}\n")
-                os.rename(file, "zad.mp3")
-            # BS4 Logic
-            # GET TITLE
+        def play_song(link):
+            def mp3_check():
+                song_there = os.path.isfile("zad.mp3")
+                if song_there:
+                    os.remove("zad.mp3")
 
-        page = urllib.request.urlopen(search_result)
+            mp3_check()
+            voice = get(client.voice_clients, guild=ctx.guild)
+            ydl_options = {
+                "format": "bestaudio/best",
+                "postprocessors": [{
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "320",
+                }]
+            }
+            with youtube_dl.YoutubeDL(ydl_options) as ydl:
+                print("Downloading Audio Now\n")
+                ydl.download([link])
+            for file in os.listdir("./"):
+                if file.endswith(".mp3"):
+                    print(f"Renamed File: {file}\n")
+                    os.rename(file, "zad.mp3")
+
+
+
+            print("Playing song\n")
+            voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: loop())
+
+            voice.source = discord.PCMVolumeTransformer(voice.sources)
+            voice.sources.volume = VOLUME_CONTROL
+
+        ## MULTIPROCESS LOGIC
+        link = youtube_search(search)
+        def multiprocessing(link):
+            
+            import time
+            from concurrent.futures import ThreadPoolExecutor
+            with ThreadPoolExecutor(max_workers=3) as executor:
+                to_do = [executor.submit(glob_check),
+                         executor.submit(play_song, link),
+                         executor.submit(telementry, link)]
+        ## BS4 Logic
+        page = urllib.request.urlopen(link)
         html = BeautifulSoup(page.read(), "html.parser")
         bs4_title = html.title.string
-        # END LOGIC
-
-        await ctx.send(f"Looping, {bs4_title}")
-        print("Playing song\n")
-        voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: loop())
         await ctx.message.add_reaction("🔂")
-        voice.source = discord.PCMVolumeTransformer(voice.sources)
-        voice.sources.volume = VOLUME_CONTROL
-
+        await ctx.send(f"Looping, {bs4_title}")
+        ## BS4 Logic ENDS
+        ## END FUNCTION CALL
+        multiprocessing(link)
+        ###
 # Stop Function
 @client.command()
 async def stop(ctx):
@@ -630,7 +651,7 @@ async def stop(ctx):
         music_isfile = os.path.isfile("zad.mp3")
         if music_isfile is True:
             os.remove('zad.mp3')
-client.run(TOKEN)
+
 
 @client.command()
 async def next(ctx):
@@ -639,7 +660,9 @@ async def next(ctx):
         print("Playing Next Song")
         voice.stop()
         await ctx.message.add_reaction("⏭️")
+client.run(TOKEN)
+
+
 ## TODO ?
 
-# Make Requests asynchronus
 # Profit?
