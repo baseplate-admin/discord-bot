@@ -15,7 +15,7 @@ from datetime import datetime
 import glob
 from bs4 import BeautifulSoup
 import calendar
-
+import concurrent.futures
 # BOT TOKEN
 TOKEN = ""
 
@@ -212,7 +212,6 @@ async def clear_error(ctx, error):
 @tasks.loop(seconds=10)
 async def change_status():
     await client.change_presence(activity=discord.Game(next(status)))
-
 
 
 #Youtube Music
@@ -610,5 +609,6 @@ async def next(ctx):
         voice.stop()
         await ctx.message.add_reaction("⏭️")
 ## TODO ?
-# You tell me.
+
+# Make Requests asynchronus
 # Profit?
