@@ -17,7 +17,7 @@ from bs4 import BeautifulSoup
 import calendar
 
 # BOT TOKEN
-TOKEN ="NzUwMzY4OTAxNDYzODAxOTg3.X05hfw.ratRPR5sNOkZUEpRSLxL8Zf87KE"
+TOKEN =""
 # QUEUE DICTIONARY
 
 queues = {}
@@ -33,14 +33,15 @@ def get_prefix(client, message):
     return prefixes[str(message.guild.id)]
 
 client = commands.Bot(command_prefix=get_prefix)
-status = cycle(["I am a bot!", "Life in python,Its fantastic", "Fun!!"])
 
 #   Discord Events!!
 
 @client.event
 async def on_ready():
-    change_status.start()
     print("I am a bot and created by BasePlate-Admin!! Woo Hoo!!")
+
+
+
 
 # COGS LOOP
 
@@ -198,9 +199,6 @@ async def clear_error(ctx, error):
 
 # Task Loop
 
-@tasks.loop(seconds=10)
-async def change_status():
-    await client.change_presence(activity=discord.Game(next(status)))
 
 # Youtube Music
 
@@ -658,5 +656,5 @@ async def reboot(ctx):
 client.run(TOKEN)
 
 ## TODO ?
-
+## ADD BOT STATUS
 # Profit?
