@@ -14,7 +14,9 @@ from datetime import datetime
 import glob
 from bs4 import BeautifulSoup
 import calendar
-
+from discord import Embed
+from discord import Member
+from typing import Optional
 # BOT TOKEN
 TOKEN = ""
 
@@ -675,10 +677,36 @@ async def members(ctx):
 Number of Members: {members}
     ```
     """)
+@client.command()
+async def userinfo(ctx, target: Optional[Member]):
+    target = target or ctx.author
+
+    embed = Embed(title="User Info",
+                  colour=target.colour,
+                  timestamp=datetime.utcnow())
+
+    embed.set_thumbnail(url=target.avatar_url)
+
+    fields = [("Name", str(target), True),
+              ("ID", target.id, True),
+              ("Bot?", target.bot, True),
+              ("Top role", target.top_role.mention, True),
+              ("Status", str(target.status).title(), True),
+              ("Activity",
+               f"{str(target.activity.type).split('.')[-1].title() if target.activity else 'N/A'} {target.activity.name if target.activity else ''}",
+               True),
+              ("Created at", target.created_at.strftime("%d/%m/%Y %H:%M:%S"), True),
+              ("Joined at", target.joined_at.strftime("%d/%m/%Y %H:%M:%S"), True),
+              ("Boosted", bool(target.premium_since), True)]
+
+    for name, value, inline in fields:
+        embed.add_field(name=name, value=value, inline=inline)
+
+    await ctx.send(embed=embed)
 
 client.run(TOKEN)
 
 ## TODO ?
-## SEE ONLINE USER STATS(ONLINE OR OFLINE)
+## How many users are online or ofline?
 ## ADD How many messages did a user sent?
 # Profit?
