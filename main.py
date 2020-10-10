@@ -17,15 +17,21 @@ from bs4 import BeautifulSoup
 import calendar
 
 # BOT TOKEN
-TOKEN =""
+
+TOKEN = ""
+
 # QUEUE DICTIONARY
 
 queues = {}
+
 # Get prefix
 
 volume = 100
 volume_int = int(volume)
 VOLUME_CONTROL = float(volume_int / 100)
+## STATUS Change
+status = cycle(["I am a bot!", "Life in python,Its fantastic", "Fun!!"])
+
 
 def get_prefix(client, message):
     jsons = open("prefixes.json", "r")
@@ -41,7 +47,11 @@ async def on_ready():
     print("I am a bot and created by BasePlate-Admin!! Woo Hoo!!")
 
 
+# Task Loop
 
+@tasks.loop(seconds=10)
+async def change_status():
+    await client.change_presence(activity=discord.Game(next(status)))
 
 # COGS LOOP
 
