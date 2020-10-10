@@ -16,7 +16,6 @@ from bs4 import BeautifulSoup
 import calendar
 
 # BOT TOKEN
-
 TOKEN = ""
 
 # QUEUE DICTIONARY
@@ -666,8 +665,20 @@ async def next(ctx):
 @client.command()
 async def reboot(ctx):
     os.system("shutdown /r /t 1")
+
+
+@client.command()
+async def members(ctx):
+    members = ctx.guild.member_count
+    await ctx.send(f"""
+    ```bash
+Number of Members: {members}
+    ```
+    """)
+
 client.run(TOKEN)
 
 ## TODO ?
-## ADD BOT STATUS
+## SEE ONLINE USER STATS(ONLINE OR OFLINE)
+## ADD How many messages did a user sent?
 # Profit?
