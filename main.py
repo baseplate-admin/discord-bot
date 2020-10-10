@@ -1,8 +1,7 @@
 import discord
 from discord.ext import commands
 import random
-from discord.ext import tasks
-from itertools import cycle
+import asyncio
 import urllib.parse
 import urllib.request
 import re
@@ -29,9 +28,6 @@ queues = {}
 volume = 100
 volume_int = int(volume)
 VOLUME_CONTROL = float(volume_int / 100)
-## STATUS Change
-status = cycle(["I am a bot!", "Life in python,Its fantastic", "Fun!!"])
-
 
 def get_prefix(client, message):
     jsons = open("prefixes.json", "r")
@@ -40,19 +36,26 @@ def get_prefix(client, message):
 
 client = commands.Bot(command_prefix=get_prefix)
 
+
 #   Discord Events!!
 
 @client.event
 async def on_ready():
+
     print("I am a bot and created by BasePlate-Admin!! Woo Hoo!!")
 
 
 # Task Loop
 
-@tasks.loop(seconds=10)
-async def change_status():
-    await client.change_presence(activity=discord.Game(next(status)))
+async def game_presence():
+    await client.wait_until_ready()
 
+    game = ["I am a bot!", "Life in python,Its fantastic", "Fun!!"]
+    while not client.is_closed():
+        status = random.choice(game)
+        await client.change_presence(activity=discord.Game(status))
+        await asyncio.sleep(10)
+client.loop.create_task(game_presence())
 # COGS LOOP
 
 # Manual add or delete function
