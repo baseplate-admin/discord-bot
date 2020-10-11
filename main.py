@@ -1,5 +1,5 @@
 # Enter Your Token
-TOKEN =
+TOKEN = ""
 
 
 from src.main import main_function_discord
