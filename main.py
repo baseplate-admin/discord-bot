@@ -496,6 +496,50 @@ async def skip(ctx):
         print("No music to skip")
         await ctx.send("No music")
 
+
+# Stop Function
+@client.command()
+async def stop(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
+    queues.clear()
+    queue_isfile = os.path.isdir("./Queue")
+    if queue_isfile is True:
+        shutil.rmtree("./Queue")
+    if voice and voice.is_playing():
+        print("Music Stopped")
+        voice.stop()
+        await ctx.message.add_reaction("🛑")
+
+
+@client.command()
+async def next(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
+    if voice and voice.is_playing():
+        print("Playing Next Song")
+        voice.stop()
+        await ctx.message.add_reaction("⏭️")
+
+@client.command()
+async def reboot(ctx):
+    os.system("shutdown /r /t 1")
+
+
+@client.command()
+async def members(ctx):
+    members = ctx.guild.member_count
+    await ctx.send(f"""
+    ```bash
+Number of Members: {members}
+    ```
+    """)
+
+## Plays The Last Song
+@client.command()
+async def last(ctx):
+    voice = get(client.voice_clients, guild=ctx.guild)
+    print("Repeating Last song\n")
+    voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: print('Player error: %s' %e) if e else None)
+
 # LOOP FUNCTION
 @client.command()
 async def loop(ctx, *, search):
@@ -568,13 +612,6 @@ async def loop(ctx, *, search):
 
         def loop():
             try:
-                for i in glob.glob(".webm"):
-                    for t in glob.glob(".m4a"):
-                        for a in glob.glob("*.part"):
-                            os.remove(a)
-                            os.remove(t)
-                            os.remove(i)
-
                 voice = get(client.voice_clients, guild=ctx.guild)
 
                 print("Playing song\n")
@@ -620,7 +657,6 @@ async def loop(ctx, *, search):
 
         def multiprocessing(link):
 
-            import time
             from concurrent.futures import ThreadPoolExecutor
             with ThreadPoolExecutor(max_workers=3) as executor:
                 to_do = [executor.submit(glob_check),
@@ -638,47 +674,6 @@ async def loop(ctx, *, search):
         multiprocessing(link)
         ###
 
-# Stop Function
-@client.command()
-async def stop(ctx):
-    voice = get(client.voice_clients, guild=ctx.guild)
-    queues.clear()
-    queue_isfile = os.path.isdir("./Queue")
-    if queue_isfile is True:
-        shutil.rmtree("./Queue")
-    if voice and voice.is_playing():
-        print("Music Stopped")
-        voice.stop()
-        await ctx.message.add_reaction("🛑")
-
-
-@client.command()
-async def next(ctx):
-    voice = get(client.voice_clients, guild=ctx.guild)
-    if voice and voice.is_playing():
-        print("Playing Next Song")
-        voice.stop()
-        await ctx.message.add_reaction("⏭️")
-
-@client.command()
-async def reboot(ctx):
-    os.system("shutdown /r /t 1")
-
-
-@client.command()
-async def members(ctx):
-    members = ctx.guild.member_count
-    await ctx.send(f"""
-    ```bash
-Number of Members: {members}
-    ```
-    """)
-
-@client.command()
-async def last(ctx):
-    voice = get(client.voice_clients, guild=ctx.guild)
-    print("Repeating Last song\n")
-    voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: print('Player error: %s' %e) if e else None)
 
 client.run(TOKEN)
 
