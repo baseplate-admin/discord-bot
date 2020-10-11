@@ -15,6 +15,7 @@ def main_function_discord(TOKEN):
     import glob
     from bs4 import BeautifulSoup
     import calendar
+    from .crypto import encrypt, decrypt
 
 
     # BOT TOKEN
@@ -31,6 +32,9 @@ def main_function_discord(TOKEN):
     VOLUME_CONTROL = float(volume_int / 100)
 
     def get_prefix(client, message):
+        if os.path.isfile("result.ejson") or os.path.isfile("prefixes.ejson"):
+            decrypt("result.ejson")
+            decrypt("prefixes.ejson")
         jsons = open("prefixes.json", "r")
         prefixes = json.load(jsons)
         return prefixes[str(message.guild.id)]
@@ -42,9 +46,12 @@ def main_function_discord(TOKEN):
 
     @client.event
     async def on_ready():
-
+        if os.path.isfile("result.ejson") or os.path.isfile("prefixes.ejson"):
+            decrypt("result.ejson")
+            decrypt("prefixes.ejson")
+        else:
+            pass
         print("I am a bot and created by BasePlate-Admin!! Woo Hoo!!")
-
 
     # Game Presence Loop
 
@@ -241,6 +248,9 @@ def main_function_discord(TOKEN):
 
     @client.command(aliases=[])
     async def play(ctx, *, search):
+        if os.path.isfile("result.ejson") or os.path.isfile('prefixes.ejson'):
+            decrypt("result.ejson")
+            decrypt("prefixes.ejson")
         if not ctx.message.author.voice:
             await ctx.send("You are not connected to a voice channel")
             return
@@ -502,6 +512,8 @@ def main_function_discord(TOKEN):
     # Stop Function
     @client.command()
     async def stop(ctx):
+        encrypt("prefixes.json")
+        encrypt("result.json")
         voice = get(client.voice_clients, guild=ctx.guild)
         queues.clear()
         queue_isfile = os.path.isdir("./Queue")
@@ -545,6 +557,8 @@ def main_function_discord(TOKEN):
     # LOOP FUNCTION
     @client.command()
     async def loop(ctx, *, search):
+        decrypt("result.ejson")
+        decrypt("prefixes.ejson")
         if not ctx.message.author.voice:
             await ctx.send("You are not connected to a voice channel")
             return
