@@ -1,7 +1,7 @@
 import os
 from cryptography.fernet import Fernet
 
-cipher = Fernet("T7OARaKJbKUmmbNfKIppYoI88mamK7WSdK88qyJqlfg=")
+cipher = Fernet('')
 def encrypt(file):
     with open(file, "rb") as f:
         content = f.read()
