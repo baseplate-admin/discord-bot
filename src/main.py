@@ -728,6 +728,7 @@ def main_function_discord(TOKEN):
                     print("No Loop Folder")
 
             def download_logic(lastelement):
+
                 Loop_infile = os.path.isdir("./LoopQueue")
                 if Loop_infile is False:
                     os.mkdir("LoopQueue")
@@ -746,7 +747,7 @@ def main_function_discord(TOKEN):
                 }
                 with youtube_dl.YoutubeDL(ydl_options) as ydl:
                     print("Downloading audio now!\n")
-                    ydl.download([laseEl])
+                    ydl.download([lastelement])
             def play():
                 play_first=(f'./LoopQueue/1.mp3')
                 voice = get(client.voice_clients, guild=ctx.guild)
@@ -758,7 +759,7 @@ def main_function_discord(TOKEN):
         
         
         # MultiProcess
-            print(loop[-1])
+            download_logic(loop[-1])
 
     client.run(TOKEN)
 
