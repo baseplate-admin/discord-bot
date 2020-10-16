@@ -691,5 +691,74 @@ def main_function_discord(TOKEN):
             ###
 
 
+
+    loop = []
+    
+    @client.command()
+    async def loopqueue(ctx, *, search):
+        if not ctx.message.author.voice:
+            await ctx.send("You are not connected to a voice channel")
+            return
+        else:
+            def search_youtube(query):
+                query_string = urllib.parse.urlencode({
+                    'search_query': query,
+                })
+                htm_content = urllib.request.urlopen(
+                    'https://www.youtube.com/results?' + query_string
+                )
+                search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
+                search_result_1 = ('https://www.youtube.com/watch?v=' + search_results[0])
+                loop.append(search_result_1)
+            ## CAN BE MULTIPROCESSED
+            
+            
+            search_youtube(search)
+
+            lastelement = loop[-1]
+            ## HERE
+            def LoopClear():
+                loop_isfile = os.path.isdir("./LoopQueue")
+                try:
+                    loop_foler = "./LoopQueue"
+                    if loop_isfile:
+                        print('Removed Old Loop Queue Folder')
+                        shutil.rmtree(loop_foler)
+                except Exception as e:
+                    print("No Loop Folder")
+
+            def download_logic(lastelement):
+                Loop_infile = os.path.isdir("./LoopQueue")
+                if Loop_infile is False:
+                    os.mkdir("LoopQueue")
+                DIR = os.path.abspath(os.path.realpath("LoopQueue"))
+                q_num = len(os.listdir(DIR))
+                q_num += 1
+                queue_path = os.path.abspath(os.path.realpath("LoopQueue") + f"\{q_num}.%(ext)s")
+                ydl_options = {
+                    "format": "bestaudio/best",
+                    "outtmpl": queue_path,
+                    "postprocessors": [{
+                        "key": "FFmpegExtractAudio",
+                        "preferredcodec": "mp3",
+                        "preferredquality": "320",
+                    }],
+                }
+                with youtube_dl.YoutubeDL(ydl_options) as ydl:
+                    print("Downloading audio now!\n")
+                    ydl.download([laseEl])
+            def play():
+                play_first=(f'./LoopQueue/1.mp3')
+                voice = get(client.voice_clients, guild=ctx.guild)
+
+                print("Playing song\n")
+                voice.play(discord.FFmpegPCMAudio(play_first), after=lambda e: None)
+                voice.source = discord.PCMVolumeTransformer(voice.source)
+                voice.source.volume = VOLUME_CONTROL
+        
+        
+        # MultiProcess
+            print(loop[-1])
+
     client.run(TOKEN)
 
