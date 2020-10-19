@@ -696,10 +696,27 @@ def main_function_discord(TOKEN):
     
     @client.command()
     async def loopqueue(ctx, *, search):
+        global voice_check
+        channel_check = ctx.message.author.voice.channel
+        voice_check = get(client.voice_clients, guild=ctx.guild)
+        if voice_check and voice_check.is_connected():
+            await voice_check.move_to(channel_check)
+        else:
+            voice_check = await channel_check.connect()
+
         if not ctx.message.author.voice:
             await ctx.send("You are not connected to a voice channel")
             return
         else:
+            def loop_remove():
+                try:
+                    loop_folder = "./LoopQueue"
+                    if loop_folder:
+                        shutil.rmtree(loop_folder)
+                except PermissionError:
+                    print("Cant delete Loop Folder")
+                    return
+        
             def search_youtube(query):
                 query_string = urllib.parse.urlencode({
                     'search_query': query,
@@ -711,11 +728,7 @@ def main_function_discord(TOKEN):
                 search_result_1 = ('https://www.youtube.com/watch?v=' + search_results[0])
                 loop.append(search_result_1)
             ## CAN BE MULTIPROCESSED
-            
-            
-            search_youtube(search)
 
-            lastelement = loop[-1]
             ## HERE
             def LoopClear():
                 loop_isfile = os.path.isdir("./LoopQueue")
@@ -748,18 +761,41 @@ def main_function_discord(TOKEN):
                 with youtube_dl.YoutubeDL(ydl_options) as ydl:
                     print("Downloading audio now!\n")
                     ydl.download([lastelement])
+            def loopQueue():
+                import time
+                i = 1
+                for files in os.listdir(os.path.abspath(os.path.realpath("LoopQueue"))):
+                    if files.endswith('.mp3'):
+                        time.sleep(1)
+                        voice = get(client.voice_clients, guild=ctx.guild)
+                        i += 1
+                        formated_text = (f'./LoopQueue/{i}.mp3')
+                        if os.path.isfile(formated_text):
+                            voice.play(discord.FFmpegPCMAudio(formated_text), after=lambda e: loopQueue())
+                            voice.source = discord.PCMVolumeTransformer(voice.source)
+                            voice.source.volume = VOLUME_CONTROL 
+                        else:
+                            print('No more Queued Song')
+                        continue
+                    else:
+                        i += 1
+                        continue
             def play():
-                play_first=(f'./LoopQueue/1.mp3')
+                play_first=('./LoopQueue/1.mp3')
                 voice = get(client.voice_clients, guild=ctx.guild)
 
                 print("Playing song\n")
-                voice.play(discord.FFmpegPCMAudio(play_first), after=lambda e: None)
+                voice.play(discord.FFmpegPCMAudio(play_first), after=lambda e: loopQueue())
                 voice.source = discord.PCMVolumeTransformer(voice.source)
                 voice.source.volume = VOLUME_CONTROL
         
         
         # MultiProcess
+            search_youtube(search)
+            loop_remove()
             download_logic(loop[-1])
+            play()
+
 
     client.run(TOKEN)
 
