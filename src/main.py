@@ -692,10 +692,20 @@ def main_function_discord(TOKEN):
 
 
 
-    loop = []
+    #loop = []
     
     @client.command()
     async def loopqueue(ctx, *, search):
+        def search_youtube(query):
+            query_string = urllib.parse.urlencode({
+                'search_query': query,
+            })
+            htm_content = urllib.request.urlopen(
+                'https://www.youtube.com/results?' + query_string
+            )
+            search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
+            search_result_1 = ('https://www.youtube.com/watch?v=' + search_results[0])
+            return search_result_1
         global voice_check
         channel_check = ctx.message.author.voice.channel
         voice_check = get(client.voice_clients, guild=ctx.guild)
@@ -713,10 +723,9 @@ def main_function_discord(TOKEN):
                 Loop_infile = os.path.isdir("./LoopQueue")
                 if Loop_infile is False:
                     os.mkdir("LoopQueue")
-                DIR = os.path.abspath(os.path.realpath("LoopQueue"))
+                DIR = os.path.abspath(os.path.realpath("./LoopQueue"))
                 q_num = len(os.listdir(DIR))
-                q_num += 1
-                queue_path = os.path.abspath(f"./LoopQueue/{q_num}.%(ext)s")
+                queue_path = os.path.abspath(os.path.realpath("LoopQueue") + f"\{q_num+1}.%(ext)s")
                 ydl_options = {
                     "format": "bestaudio/best",
                     "outtmpl": queue_path,
@@ -728,19 +737,18 @@ def main_function_discord(TOKEN):
                 }
                 with youtube_dl.YoutubeDL(ydl_options) as ydl:
                     print("Downloading audio now!\n")
-                    ydl.download([loop[-1]]) 
-            else:
-                def search_youtube(query):
-                    query_string = urllib.parse.urlencode({
-                        'search_query': query,
-                    })
-                    htm_content = urllib.request.urlopen(
-                        'https://www.youtube.com/results?' + query_string
-                    )
-                    search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
-                    search_result_1 = ('https://www.youtube.com/watch?v=' + search_results[0])
-                    loop.append(search_result_1)
+                    ydl.download([search_youtube(search)])
+                await ctx.send("Adding " + search + " to the queue")
+                print("Song Added to queue\n")
 
+            else:
+                def loop_folder_clear():
+                    try:
+                        loop_foler = "./LoopQueue"
+                        if os.path.isdir(loop_foler):
+                            shutil.rmtree(loop_foler)
+                    except PermissionError:
+                        print("Cannot remove folder")
 
 
                 def download_logic(lastelement):
@@ -791,19 +799,10 @@ def main_function_discord(TOKEN):
                     voice.source = discord.PCMVolumeTransformer(voice.source)
                     voice.source.volume = VOLUME_CONTROL
             
-            
             # MultiProcess
-                # loop_remove()
-
-                search_youtube(search)
-
-                download_logic(loop[-1])
-
+                loop_folder_clear()
+                download_logic(search_youtube(search))
                 play()
 
 
-
     client.run(TOKEN)
-
-## ERROR WHERE THE SONG LAST SONG IS PLAYING INSTEAD OF SEARCHED ONES
-## NEED TO ADD REMOVE LOOPQUEUE FOLDER
