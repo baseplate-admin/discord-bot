@@ -1,8 +1,5 @@
 import os
-def check_loop():
-    loopqueuenumer = 0
-    for i in range(0,len(os.listdir(os.path.realpath("./LoopQueue")))):
-        print("hello")
-        loopqueuenumer += 1
-        
-check_loop()
+DIR = os.path.abspath(os.path.realpath("./idea/LoopQueue"))
+first_file = os.listdir(DIR)[-1]
+
+print(first_file.strip(".txt"))
