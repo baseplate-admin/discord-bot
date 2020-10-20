@@ -802,7 +802,13 @@ def main_function_discord(TOKEN):
             # MultiProcess
                 loop_folder_clear()
                 download_logic(search_youtube(search))
-                play()
+                loopQueue()
 
 
     client.run(TOKEN)
+
+
+## ADD TRANSLATION FEATURE??
+## FIX LOOPING WITH BS4
+## Add Encrypt and decrypt to loopqueue
+## MERGE LOOP, LOOPQUEUE, Last
