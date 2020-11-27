@@ -16,6 +16,7 @@ def main_function_discord(TOKEN):
     from bs4 import BeautifulSoup
     import calendar
     from .crypto import encrypt, decrypt
+    from .autoupgrade import update_pip_function
 
 
     # BOT TOKEN
@@ -58,6 +59,19 @@ def main_function_discord(TOKEN):
             decrypt("prefixes.ejson")
         else:
             pass
+        for files in os.listdir('./'):
+            if files.endswith('.mp3'):
+                os.remove(files)
+
+        loop_folder_is_there = os.path.isdir('./LoopQueue')
+        queue_folder_is_there = os.path.isdir('./Queue')
+
+        if loop_folder_is_there is True:
+            shutil.rmtree('./LoopQueue')
+        if queue_folder_is_there is True:
+            shutil.rmtree('./Queue')
+
+
         print("I am a bot and created by BasePlate-Admin!! Woo Hoo!!")
 
     # Game Presence Loop
@@ -134,6 +148,11 @@ def main_function_discord(TOKEN):
             json.dump(prefixes, f, indent=4)
 
     #   Client Commands!!!
+    #   Update PIP
+    @client.command()
+    async def updatePiP(ctx):
+        update_pip_function()
+
     #   Change Prefix
     @client.command()
     async def changeprefix(ctx, prefix):
@@ -348,7 +367,15 @@ def main_function_discord(TOKEN):
                 with youtube_dl.YoutubeDL(ydl_options) as ydl:
                     print("Downloading audio now!\n")
                     ydl.download([search_youtube(search)])
-                await ctx.send("Adding " + search + " to the queue")
+
+                def add_bs4_title(search_in_bs4):
+                    link = search_youtube(search_in_bs4)
+                    page = urllib.request.urlopen(link)
+                    html = BeautifulSoup(page.read(), "html.parser")
+                    bs4_title_1 = html.title.string
+                    return bs4_title_1
+
+                await ctx.send(f'Adding {add_bs4_title(search)} to Queue')
                 print("Song Added to queue\n")
 
             else:
@@ -793,8 +820,18 @@ def main_function_discord(TOKEN):
                 with youtube_dl.YoutubeDL(ydl_options) as ydl:
                     print("Downloading audio now!\n")
                     ydl.download([search_youtube(search)])
-                await ctx.send("Adding " + search + " to the queue")
-                print("Song Added to queue\n")
+
+
+                def add_bs4_title(search_in_bs4):
+                    link = search_youtube(search_in_bs4)
+                    page = urllib.request.urlopen(link)
+                    html = BeautifulSoup(page.read(), "html.parser")
+                    bs4_title_1 = html.title.string
+                    return bs4_title_1
+
+                await ctx.send(f'Adding {add_bs4_title(search)} to Loop')
+                print("Song Added to Loop\n")
+
 
             else:
                 def check_queue():
