@@ -10,7 +10,7 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="JupyterTrust" id="6ab16cbc-511e-4dad-b658-ea534aab1f26" />
+  <component name="JupyterTrust" id="fd22c071-4f65-401a-a22d-2e3edeb264e2" />
   <component name="ProjectId" id="1jVsmc7lpoIr8TIaiKdxnZKolBM" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -68,6 +68,10 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="414" y="175" width="1092" height="714" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1920.1040@0.0.1920.1040" timestamp="1603903515343" />
+    <state x="715" y="310" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1606486565852">
+      <screen x="0" y="0" width="1920" height="1040" />
+    </state>
+    <state x="715" y="310" key="#com.intellij.fileTypes.FileTypeChooser/0.0.1920.1040@0.0.1920.1040" timestamp="1606486565852" />
     <state x="740" y="287" key="FileChooserDialogImpl" timestamp="1603903513228">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
