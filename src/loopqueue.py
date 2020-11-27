@@ -182,9 +182,10 @@ def main_function_discord(TOKEN):
                         if length != 0:
                             print("Song done, playing next queued\n")
                             print(f"Songs still in queue: {still_q}")
-                            song_there = os.path.isfile("zad.mp3")
-                            if song_there:
-                                os.remove("zad.mp3")
+                            for files in os.listdir(os.getcwd()):
+                                song_there = os.path.isfile("zad.mp3")
+                                if song_there:
+                                    os.remove("zad.mp3")
 
                             shutil.move(song_path, main_location)
                             for file in os.listdir("./"):
