@@ -250,4 +250,28 @@
   "time": "20:47:5.900431",
   "day": "Friday November 27, 2020",
   "type": "play"
+}{
+  "url": "https://www.youtube.com/watch?v=250EIlV0_tM",
+  "query": "https://www.youtube.com/watch?v=250EIlV0_tM",
+  "time": "21:19:24.528545",
+  "day": "Friday November 27, 2020",
+  "type": "loopqueue"
+}{
+  "url": "https://www.youtube.com/watch?v=K0ibBPhiaG0",
+  "query": "castle on the hill",
+  "time": "21:19:32.113351",
+  "day": "Friday November 27, 2020",
+  "type": "loopqueue"
+}{
+  "url": "https://www.youtube.com/watch?v=250EIlV0_tM",
+  "query": "https://www.youtube.com/watch?v=250EIlV0_tM",
+  "time": "21:21:22.107121",
+  "day": "Friday November 27, 2020",
+  "type": "loopqueue"
+}{
+  "url": "https://www.youtube.com/watch?v=K0ibBPhiaG0",
+  "query": "castle on the hill",
+  "time": "21:21:22.824687",
+  "day": "Friday November 27, 2020",
+  "type": "loopqueue"
 }

@@ -22,14 +22,21 @@ def main_function_discord(TOKEN):
 
 
     # QUEUE DICTIONARY
-
     queues = {}
 
-    # Get prefix
+    # Song Number
+
+    global songNumber
+    songNumber = 0
+
+    # Volume Control
 
     volume = 100
     volume_int = int(volume)
     VOLUME_CONTROL = float(volume_int / 100)
+
+
+    # Get prefix
 
     def get_prefix(client, message):
         if os.path.isfile("result.ejson") or os.path.isfile("prefixes.ejson"):
@@ -688,7 +695,6 @@ def main_function_discord(TOKEN):
             ## END FUNCTION CALL
             multiprocessing(link)
             ###
-
 
 
 
