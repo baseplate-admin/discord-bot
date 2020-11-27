@@ -141,3 +141,4 @@ ffmpeg.exe
 ffprobe.exe
 ffplay.exe
 *.mp3
+main.py
