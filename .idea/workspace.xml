@@ -23,7 +23,7 @@
     <property name="restartRequiresConfirmation" value="false" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager" selected="Python.pip-autoupgrade">
+  <component name="RunManager" selected="Python.main">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" nameIsGenerated="true">
       <module name="discord" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -84,7 +84,9 @@
       <workItem from="1603900756711" duration="22000" />
       <workItem from="1603900830545" duration="211000" />
       <workItem from="1603903376424" duration="1145000" />
-      <workItem from="1606489594715" duration="1203000" />
+      <workItem from="1606489594715" duration="1321000" />
+      <workItem from="1606491312455" duration="74000" />
+      <workItem from="1606491407243" duration="1356000" />
     </task>
     <servers />
   </component>
@@ -104,29 +106,30 @@
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="740" y="287" key="FileChooserDialogImpl/0.0.1920.1040@0.0.1920.1040" timestamp="1606490804636" />
-    <state width="1876" height="275" key="GridCell.Tab.0.bottom" timestamp="1606490669454">
+    <state width="1876" height="275" key="GridCell.Tab.0.bottom" timestamp="1606493070073">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="275" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1606490669454" />
-    <state width="1876" height="275" key="GridCell.Tab.0.center" timestamp="1606490669453">
+    <state width="1876" height="275" key="GridCell.Tab.0.bottom/0.0.1920.1040@0.0.1920.1040" timestamp="1606493070073" />
+    <state width="1876" height="275" key="GridCell.Tab.0.center" timestamp="1606493070072">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="275" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1606490669453" />
-    <state width="1876" height="275" key="GridCell.Tab.0.left" timestamp="1606490669453">
+    <state width="1876" height="275" key="GridCell.Tab.0.center/0.0.1920.1040@0.0.1920.1040" timestamp="1606493070072" />
+    <state width="1876" height="275" key="GridCell.Tab.0.left" timestamp="1606493070072">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="275" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1606490669453" />
-    <state width="1876" height="275" key="GridCell.Tab.0.right" timestamp="1606490669454">
+    <state width="1876" height="275" key="GridCell.Tab.0.left/0.0.1920.1040@0.0.1920.1040" timestamp="1606493070072" />
+    <state width="1876" height="275" key="GridCell.Tab.0.right" timestamp="1606493070073">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
-    <state width="1876" height="275" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1606490669454" />
+    <state width="1876" height="275" key="GridCell.Tab.0.right/0.0.1920.1040@0.0.1920.1040" timestamp="1606493070073" />
     <state x="461" y="165" key="SettingsEditor" timestamp="1606489582410">
       <screen x="0" y="0" width="1920" height="1040" />
     </state>
     <state x="461" y="165" key="SettingsEditor/0.0.1920.1040@0.0.1920.1040" timestamp="1606489582410" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/discord$main.coverage" NAME="main Coverage Results" MODIFIED="1606490463499" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/discord$pip_autoupgrade.coverage" NAME="pip-autoupgrade Coverage Results" MODIFIED="1606490806651" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/discord$main.coverage" NAME="main Coverage Results" MODIFIED="1606493070064" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/discord$mainpy.coverage" NAME="main Coverage Results" MODIFIED="1606487985918" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
     <SUITE FILE_PATH="coverage/discord_bot$start.coverage" NAME="start Coverage Results" MODIFIED="1603904378263" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
