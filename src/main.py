@@ -297,7 +297,7 @@ def main_function_discord(TOKEN):
                     "type": "play",
                 }
                 with open('result.json', 'a') as fp:
-                   json.dump(dict, fp, indent=2)
+                    json.dump(dict, fp, indent=2)
 
             ## TIME KILL FUNTION
             def time_wait(seconds):
@@ -347,7 +347,6 @@ def main_function_discord(TOKEN):
             else:
                 def check_queue():
                     voice = get(client.voice_clients, guild=ctx.guild)
-                    time_wait(5)
                     Queue_infile = os.path.isdir("./Queue")
                     if Queue_infile is True:
                         DIR = os.path.abspath(os.path.realpath("Queue"))
@@ -359,7 +358,7 @@ def main_function_discord(TOKEN):
                             print("No queued song(s)\n")
                             queues.clear()
                             return
-                        main_location = os.path.dirname(os.path.realpath(__file__))
+                        main_location = os.getcwd()
                         song_path = os.path.abspath(os.path.realpath("Queue") + "\\" + first_file)
                         if length != 0:
                             print("Song done, playing next queued\n")
@@ -689,6 +688,8 @@ def main_function_discord(TOKEN):
             ## END FUNCTION CALL
             multiprocessing(link)
             ###
+
+
 
 
     client.run(TOKEN)
