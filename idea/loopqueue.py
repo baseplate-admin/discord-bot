@@ -22,8 +22,7 @@ def main_function_discord(TOKEN):
 
     # Song Number
 
-    global songNumber
-    songNumber = 0
+
 
     # Volume Control
 
@@ -66,7 +65,8 @@ def main_function_discord(TOKEN):
     client.loop.create_task(game_presence())
 
     @client.command()
-    async def play(ctx, *, search):
+    async def loopqueue(ctx, *, search):
+        songNumber = 0
         if os.path.isfile("result.ejson") or os.path.isfile('prefixes.ejson'):
             decrypt("result.ejson")
             decrypt("prefixes.ejson")
@@ -134,10 +134,11 @@ def main_function_discord(TOKEN):
                 voice_check = await channel_check.connect()
 
             if voice_check and voice_check.is_playing():
-                Queue_infile = os.path.isdir("./Queue")
+
+                Queue_infile = os.path.isdir("./LoopQueue")
                 if Queue_infile is False:
-                    os.mkdir("Queue")
-                DIR = os.path.abspath(os.path.realpath("Queue"))
+                    os.mkdir("LoopQueue")
+                DIR = os.path.abspath(os.path.realpath("LoopQueue"))
                 q_num = len(os.listdir(DIR))
                 q_num += 1
                 add_queue = True
@@ -147,7 +148,7 @@ def main_function_discord(TOKEN):
                     else:
                         add_queue = False
                         queues[q_num] = q_num
-                queue_path = os.path.abspath(os.path.realpath("Queue") + f"\song{q_num}.%(ext)s")
+                queue_path = os.path.abspath(os.path.realpath("LoopQueue") + f"\song{q_num}.%(ext)s")
                 ydl_options = {
                     "format": "bestaudio/best",
                     "outtmpl": queue_path,
@@ -165,40 +166,50 @@ def main_function_discord(TOKEN):
 
             else:
                 def check_queue():
+                    try:
+                        global songNumber
+                        songNumber = songNumber + 1
+                    except Exception as e:
+                        print(e)
+
                     voice = get(client.voice_clients, guild=ctx.guild)
-                    Queue_infile = os.path.isdir("./Queue")
+                    Queue_infile = os.path.isdir("./LoopQueue")
                     if Queue_infile is True:
-                        DIR = os.path.abspath(os.path.realpath("Queue"))
+                        DIR = os.path.abspath(os.path.realpath("LoopQueue"))
                         length = len(os.listdir(DIR))
                         still_q = length - 1
                         try:
-                            first_file = os.listdir(DIR)[0]
+                            first_file = os.listdir(DIR)[songNumber]
                         except:
-                            print("No queued song(s)\n")
-                            queues.clear()
-                            return
+                            print('Resetting songs')
+                            songNumber = -1
+                            check_queue()
+
                         main_location = os.getcwd()
-                        song_path = os.path.abspath(os.path.realpath("Queue") + "\\" + first_file)
+                        song_path = os.path.abspath(os.path.realpath("LoopQueue") + "\\" + first_file)
+
                         if length != 0:
                             print("Song done, playing next queued\n")
                             print(f"Songs still in queue: {still_q}")
                             for files in os.listdir(os.getcwd()):
-                                song_there = os.path.isfile("zad.mp3")
-                                if song_there:
-                                    os.remove("zad.mp3")
-
-                            shutil.move(song_path, main_location)
-                            for file in os.listdir("./"):
+                                if files.endswith(".mp3"):
+                                    os.remove(files)
+                            try:
+                                shutil.copy(song_path, main_location)
+                            except:
+                                print("Killed Error(s)\n")
+                            for file in os.listdir("../src/"):
                                 if file.endswith(".mp3"):
                                     os.rename(file, "zad.mp3")
-                            voice.play(discord.FFmpegPCMAudio('zad.mp3'), after=lambda e: check_queue())
-                            voice.source = discord.PCMVolumeTransformer(voice.source)
-                            voice.source.volume = VOLUME_CONTROL
+                            try:
+                                voice.play(discord.FFmpegPCMAudio('zad.mp3'), after=lambda e: check_queue())
+                                voice.source = discord.PCMVolumeTransformer(voice.source)
+                                voice.source.volume = VOLUME_CONTROL
+                            except:
+                                print("Killed Discord Play error\n")
                         else:
-                            queues.clear()
                             return
                     else:
-                        queues.clear()
                         print("No songs were queued before")
 
                 def song_and_queue_check():
@@ -212,9 +223,9 @@ def main_function_discord(TOKEN):
                         print("Trying to delete songs, but its being played")
                         # await ctx.send("ERROR:MUSIC PLAYING.")
                         return
-                    Queue_infile = os.path.isdir("./Queue")
+                    Queue_infile = os.path.isdir("./LoopQueue")
                     try:
-                        Queue_folder = "./Queue"
+                        Queue_folder = "./LoopQueue"
                         if Queue_infile is True:
                             print("Removed old Queue Folder")
                             shutil.rmtree(Queue_folder)
@@ -224,18 +235,46 @@ def main_function_discord(TOKEN):
                 # Downloading
 
                 def play_song(link):
+                    Queue_infile = os.path.isdir("./LoopQueue")
+                    if Queue_infile is False:
+                        os.mkdir("LoopQueue")
+                    DIR = os.path.abspath(os.path.realpath("LoopQueue"))
+                    q_num = len(os.listdir(DIR))
+                    q_num += 1
+                    add_queue = True
+                    while add_queue:
+                        if q_num in queues:
+                            q_num += 1
+                        else:
+                            add_queue = False
+                            queues[q_num] = q_num
+                    queue_path = os.path.abspath(os.path.realpath("LoopQueue") + f"\song{q_num}.%(ext)s")
                     ydl_options = {
                         "format": "bestaudio/best",
+                        "outtmpl": queue_path,
                         "postprocessors": [{
                             "key": "FFmpegExtractAudio",
                             "preferredcodec": "mp3",
                             "preferredquality": "320",
-                        }]
+                        }],
                     }
                     with youtube_dl.YoutubeDL(ydl_options) as ydl:
                         print("Downloading Audio Now\n")
                         ydl.download([link])
-                    for file in os.listdir("./"):
+                    DIR = os.path.abspath(os.path.realpath("LoopQueue"))
+                    length = len(os.listdir(DIR))
+                    still_q = length - 1
+                    try:
+                        first_file = os.listdir(DIR)[songNumber]
+                    except:
+                        print("No queued song(s)\n")
+                        return
+                    main_location = os.getcwd()
+                    song_path = os.path.abspath(os.path.realpath("LoopQueue") + "\\" + first_file)
+
+                    shutil.copy(song_path, main_location)
+
+                    for file in os.listdir("../src/"):
                         if file.endswith(".mp3"):
                             print(f"Renamed File: {file}\n")
                             os.rename(file, "zad.mp3")
