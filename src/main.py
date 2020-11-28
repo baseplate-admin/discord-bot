@@ -1,4 +1,4 @@
-def main_function_discord(TOKEN):
+def main_function_discord(token):
     import discord
     from discord.ext import commands
     import random
@@ -59,17 +59,17 @@ def main_function_discord(TOKEN):
             decrypt("prefixes.ejson")
         else:
             pass
-        for files in os.listdir('./'):
-            if files.endswith('.mp3'):
+        for files in os.listdir("./"):
+            if files.endswith(".mp3"):
                 os.remove(files)
 
-        loop_folder_is_there = os.path.isdir('./LoopQueue')
-        queue_folder_is_there = os.path.isdir('./Queue')
+        loop_folder_is_there = os.path.isdir("./LoopQueue")
+        queue_folder_is_there = os.path.isdir("./Queue")
 
         if loop_folder_is_there is True:
-            shutil.rmtree('./LoopQueue')
+            shutil.rmtree("./LoopQueue")
         if queue_folder_is_there is True:
-            shutil.rmtree('./Queue')
+            shutil.rmtree("./Queue")
 
 
         print("I am a bot and created by BasePlate-Admin!! Woo Hoo!!")
@@ -116,7 +116,7 @@ def main_function_discord(TOKEN):
     #   On member kick
     @client.event
     async def on_member_remove(member):
-        print(f'{member} has been kicked from the server!! We will not miss him')
+        print(f"{member} has been kicked from the server!! We will not miss him")
 
     #   On member Add
     @client.event
@@ -156,14 +156,14 @@ def main_function_discord(TOKEN):
     #   Change Prefix
     @client.command()
     async def changeprefix(ctx, prefix):
-        with open('prefixes.json', 'r') as f:
+        with open("prefixes.json", "r") as f:
             prefixes = json.load(f)
 
         prefixes[str(ctx.guild.id)] = prefix
-        with open('prefixes.json', 'w') as f:
+        with open("prefixes.json", "w") as f:
             json.dump(prefixes, f, indent=4)
 
-        await ctx.send(f'Prefix changed to: {prefix}')
+        await ctx.send(f"Prefix changed to: {prefix}")
 
     #   Ping Command
     @client.command()
@@ -171,7 +171,7 @@ def main_function_discord(TOKEN):
         await ctx.send(f"Pong! {round(client.latency * 1000)}ms")
 
     #   Luck Generator
-    @client.command(aliases=['luckgen'])
+    @client.command(aliases=["luckgen"])
     async def _8ball(ctx, *, question):
         responses = [
             "It is certain.",
@@ -195,7 +195,7 @@ def main_function_discord(TOKEN):
             "Outlook not so good.",
             "Very Doubtful."
         ]
-        await ctx.send(f'Questions: {question} \n Answer: {random.choice(responses)}')
+        await ctx.send(f"Questions: {question} \n Answer: {random.choice(responses)}")
 
     # Clear Chat
     @client.command()
@@ -205,7 +205,7 @@ def main_function_discord(TOKEN):
 
     # Clear All Chat
 
-    @client.command(aliases=['clearchatall'])
+    @client.command(aliases=["clearchatall"])
     @commands.has_role("Management")
     async def chatclearall(ctx,
                            amount=9999999999999):
@@ -216,14 +216,14 @@ def main_function_discord(TOKEN):
     @commands.has_role("Management")
     async def byebye(ctx, member: discord.Member, *, reason=None):
         await member.kick(reason=reason)
-        await ctx.send(f'{member.mention} is naughty. We dont want him in our server!!')
+        await ctx.send(f"{member.mention} is naughty. We dont want him in our server!!")
 
     # Ban
     @client.command(aliases=["fuck_you", "jail"])
     @commands.has_role("Management")
     async def gotojail(ctx, member: discord.Member, *, reason=None):
         await member.ban(reason=reason)
-        await ctx.send(f'{member.mention}  has done a crime and admins sent him to jail.')
+        await ctx.send(f"{member.mention}  has done a crime and admins sent him to jail.")
 
     # Unban
     @client.command()
@@ -234,7 +234,7 @@ def main_function_discord(TOKEN):
             user = i.user
             if (user.name, user.discriminator) == (mem_nem, mem_dis):
                 await ctx.guild.unban(user)
-                await ctx.send(f'Unbanned {user.mention} welcome back!!')
+                await ctx.send(f"Unbanned {user.mention} welcome back!!")
                 return
 
     # Error
@@ -274,7 +274,7 @@ def main_function_discord(TOKEN):
 
     @client.command(aliases=[])
     async def play(ctx, *, search):
-        if os.path.isfile("result.ejson") or os.path.isfile('prefixes.ejson'):
+        if os.path.isfile("result.ejson") or os.path.isfile("prefixes.ejson"):
             decrypt("result.ejson")
             decrypt("prefixes.ejson")
         if not ctx.message.author.voice:
@@ -283,13 +283,13 @@ def main_function_discord(TOKEN):
         else:
             def search_youtube(query):
                 query_string = urllib.parse.urlencode({
-                    'search_query': query,
+                    "search_query": query,
                 })
                 htm_content = urllib.request.urlopen(
-                    'https://www.youtube.com/results?' + query_string
+                    "https://www.youtube.com/results?" + query_string
                 )
-                search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
-                search_result_1 = ('https://www.youtube.com/watch?v=' + search_results[0])
+                search_results = re.findall(r"/watch\?v=(.{11})", htm_content.read().decode())
+                search_result_1 = ("https://www.youtube.com/watch?v=" + search_results[0])
                 return search_result_1
 
             # TIME AND DATE
@@ -322,7 +322,7 @@ def main_function_discord(TOKEN):
                     "day": string,
                     "type": "play",
                 }
-                with open('result.json', 'a') as fp:
+                with open("result.json", "a") as fp:
                     json.dump(dict, fp, indent=2)
 
             ## TIME KILL FUNTION
@@ -375,7 +375,7 @@ def main_function_discord(TOKEN):
                     bs4_title_1 = html.title.string
                     return bs4_title_1
 
-                await ctx.send(f'Adding {add_bs4_title(search)} to Queue')
+                await ctx.send(f"Adding {add_bs4_title(search)} to Queue")
                 print("Song Added to queue\n")
 
             else:
@@ -406,7 +406,7 @@ def main_function_discord(TOKEN):
                             for file in os.listdir("./"):
                                 if file.endswith(".mp3"):
                                     os.rename(file, "zad.mp3")
-                            voice.play(discord.FFmpegPCMAudio('zad.mp3'), after=lambda e: check_queue())
+                            voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: check_queue())
                             voice.source = discord.PCMVolumeTransformer(voice.source)
                             voice.source.volume = VOLUME_CONTROL
                         else:
@@ -518,7 +518,7 @@ def main_function_discord(TOKEN):
 
         if voices and voices.is_paused():
             voices.resume()
-            await ctx.message.add_reaction('⏯')
+            await ctx.message.add_reaction("⏯")
         else:
             await ctx.send("Music is not resumed")
 
@@ -586,7 +586,7 @@ def main_function_discord(TOKEN):
     async def last(ctx):
         voice = get(client.voice_clients, guild=ctx.guild)
         print("Repeating Last song\n")
-        voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: print('Player error: %s' %e) if e else None)
+        voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: print("Player error: %s" %e) if e else None)
 
     # LOOP FUNCTION
     @client.command()
@@ -600,13 +600,13 @@ def main_function_discord(TOKEN):
 
             def youtube_search(search):
                 query_string = urllib.parse.urlencode({
-                    'search_query': search
+                    "search_query": search
                 })
                 htm_content = urllib.request.urlopen(
-                    'https://www.youtube.com/results?' + query_string
+                    "https://www.youtube.com/results?" + query_string
                 )
-                search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
-                search_result = ('https://www.youtube.com/watch?v=' + search_results[0])
+                search_results = re.findall(r"/watch\?v=(.{11})", htm_content.read().decode())
+                search_result = ("https://www.youtube.com/watch?v=" + search_results[0])
                 return search_result
 
             # TIME AND DATE
@@ -639,7 +639,7 @@ def main_function_discord(TOKEN):
                     "day": string,
                     "type": "loop",
                 }
-                with open('result.json', 'a') as fp:
+                with open("result.json", "a") as fp:
                     json.dump(dict, fp, indent=2)
 
             # Checks and connects to user voice channel
@@ -726,7 +726,7 @@ def main_function_discord(TOKEN):
     @client.command()
     async def loopqueue(ctx, *, search):
         songNumber = 0
-        if os.path.isfile("result.ejson") or os.path.isfile('prefixes.ejson'):
+        if os.path.isfile("result.ejson") or os.path.isfile("prefixes.ejson"):
             decrypt("result.ejson")
             decrypt("prefixes.ejson")
         if not ctx.message.author.voice:
@@ -735,13 +735,13 @@ def main_function_discord(TOKEN):
         else:
             def search_youtube(query):
                 query_string = urllib.parse.urlencode({
-                    'search_query': query,
+                    "search_query": query,
                 })
                 htm_content = urllib.request.urlopen(
-                    'https://www.youtube.com/results?' + query_string
+                    "https://www.youtube.com/results?" + query_string
                 )
-                search_results = re.findall(r'/watch\?v=(.{11})', htm_content.read().decode())
-                search_result_1 = ('https://www.youtube.com/watch?v=' + search_results[0])
+                search_results = re.findall(r"/watch\?v=(.{11})", htm_content.read().decode())
+                search_result_1 = ("https://www.youtube.com/watch?v=" + search_results[0])
                 return search_result_1
 
             # TIME AND DATE
@@ -774,7 +774,7 @@ def main_function_discord(TOKEN):
                     "day": string,
                     "type": "play",
                 }
-                with open('result.json', 'a') as fp:
+                with open("result.json", "a") as fp:
                     json.dump(dict, fp, indent=2)
 
             ## TIME KILL FUNTION
@@ -829,7 +829,7 @@ def main_function_discord(TOKEN):
                     bs4_title_1 = html.title.string
                     return bs4_title_1
 
-                await ctx.send(f'Adding {add_bs4_title(search)} to Loop')
+                await ctx.send(f"Adding {add_bs4_title(search)} to Loop")
                 print("Song Added to Loop\n")
 
 
@@ -850,7 +850,7 @@ def main_function_discord(TOKEN):
                         try:
                             first_file = os.listdir(DIR)[songNumber]
                         except:
-                            print('Resetting songs')
+                            print("Resetting songs")
                             songNumber = -1
                             check_queue()
 
@@ -871,7 +871,7 @@ def main_function_discord(TOKEN):
                                 if file.endswith(".mp3"):
                                     os.rename(file, "zad.mp3")
                             try:
-                                voice.play(discord.FFmpegPCMAudio('zad.mp3'), after=lambda e: check_queue())
+                                voice.play(discord.FFmpegPCMAudio("zad.mp3"), after=lambda e: check_queue())
                                 voice.source = discord.PCMVolumeTransformer(voice.source)
                                 voice.source.volume = VOLUME_CONTROL
                             except:
@@ -992,4 +992,4 @@ def main_function_discord(TOKEN):
                 multiprocessing(link)
 
 
-    client.run(TOKEN)
+    client.run(token)
