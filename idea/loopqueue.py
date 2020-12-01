@@ -101,8 +101,6 @@ def main_function_discord(TOKEN):
                 my_date = date.today()
                 x = calendar.day_name[my_date.weekday()]
 
-                from datetime import date
-
                 today = date.today()
                 d2 = today.strftime("%B %d, %Y")
 
