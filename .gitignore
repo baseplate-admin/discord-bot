@@ -148,4 +148,9 @@ ffplay.exe
 .idea/modules.xml
 .idea/vcs.xml
 .idea/workspace.xml
+<<<<<<< Updated upstream
 .idea/pythonProject.iml
+=======
+*.iml
+*.pyc
+>>>>>>> Stashed changes
